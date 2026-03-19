@@ -1,0 +1,102 @@
+"use client";
+
+import { Progress } from "@/components/ui/progress";
+import { DollarSign } from "lucide-react";
+import type { Budget, Expense, ExpenseCategory } from "@/types/database";
+
+const CATEGORY_COLORS: Record<ExpenseCategory, string> = {
+  equipment: "bg-blue-500",
+  travel: "bg-purple-500",
+  fees: "bg-orange-500",
+  facilities: "bg-cyan-500",
+  medical: "bg-red-500",
+  uniforms: "bg-pink-500",
+  other: "bg-gray-400",
+};
+
+interface Props {
+  budget: Budget | null;
+  expenses: Expense[];
+}
+
+export function BudgetSummary({ budget, expenses }: Props) {
+  const totalSpent = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
+  const remaining = budget ? Number(budget.total_amount) - totalSpent : 0;
+  const percentUsed = budget
+    ? Math.min(Math.round((totalSpent / Number(budget.total_amount)) * 100), 100)
+    : 0;
+
+  const byCategory: Partial<Record<ExpenseCategory, number>> = {};
+  for (const expense of expenses) {
+    byCategory[expense.category] = (byCategory[expense.category] ?? 0) + Number(expense.amount);
+  }
+
+  const progressColor =
+    percentUsed >= 90
+      ? "text-red-600"
+      : percentUsed >= 75
+        ? "text-yellow-600"
+        : "text-green-600";
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-1.5 text-sm font-medium">
+        <DollarSign className="h-4 w-4" />
+        Budget
+        {budget && (
+          <span className="text-xs text-muted-foreground ml-1">({budget.season})</span>
+        )}
+      </div>
+
+      {!budget ? (
+        <p className="text-sm text-muted-foreground py-4 text-center">
+          No budget set. Ask the assistant to set one!
+        </p>
+      ) : (
+        <>
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="rounded-lg bg-muted p-2">
+              <p className="text-xs text-muted-foreground">Total</p>
+              <p className="font-semibold text-sm">${Number(budget.total_amount).toFixed(2)}</p>
+            </div>
+            <div className="rounded-lg bg-muted p-2">
+              <p className="text-xs text-muted-foreground">Spent</p>
+              <p className="font-semibold text-sm">${totalSpent.toFixed(2)}</p>
+            </div>
+            <div className="rounded-lg bg-muted p-2">
+              <p className="text-xs text-muted-foreground">Left</p>
+              <p className={`font-semibold text-sm ${progressColor}`}>
+                ${remaining.toFixed(2)}
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>{percentUsed}% used</span>
+              <span>${remaining.toFixed(2)} remaining</span>
+            </div>
+            <Progress value={percentUsed} className="h-2" />
+          </div>
+
+          {Object.keys(byCategory).length > 0 && (
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-muted-foreground">By Category</p>
+              {(Object.entries(byCategory) as [ExpenseCategory, number][])
+                .sort(([, a], [, b]) => b - a)
+                .map(([cat, amount]) => (
+                  <div key={cat} className="flex items-center gap-2 text-xs">
+                    <div
+                      className={`h-2 w-2 rounded-full shrink-0 ${CATEGORY_COLORS[cat]}`}
+                    />
+                    <span className="capitalize flex-1">{cat}</span>
+                    <span className="font-medium">${amount.toFixed(2)}</span>
+                  </div>
+                ))}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
