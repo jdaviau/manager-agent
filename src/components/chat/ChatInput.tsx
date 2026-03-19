@@ -40,22 +40,22 @@ export function ChatInput({ onSend, disabled }: Props) {
   }
 
   return (
-    <div className="flex items-end gap-2 p-3 border-t bg-background">
+    <div className="flex items-end gap-2 p-3 border-t bg-white">
       <Textarea
         ref={textareaRef}
         value={value}
         onChange={handleInput}
         onKeyDown={handleKeyDown}
-        placeholder="Ask your coach assistant... (Enter to send, Shift+Enter for new line)"
+        placeholder="Message your assistant... (Enter to send)"
         disabled={disabled}
         rows={1}
-        className="resize-none min-h-[40px] max-h-[140px] overflow-y-auto"
+        className="resize-none min-h-[40px] max-h-[140px] overflow-y-auto bg-muted/50 border-border/60 focus-visible:ring-1 focus-visible:ring-primary/50 rounded-xl text-sm"
       />
       <Button
         onClick={handleSubmit}
         disabled={disabled || !value.trim()}
         size="icon"
-        className="shrink-0 mb-0.5"
+        className="shrink-0 mb-0.5 rounded-xl h-10 w-10"
       >
         <SendHorizonal className="h-4 w-4" />
       </Button>

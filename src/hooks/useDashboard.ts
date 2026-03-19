@@ -11,6 +11,8 @@ interface DashboardData {
   games: Game[];
   costPerPlayer: number;
   costPerGame: number;
+  activePlayers: number;
+  totalSpent: number;
   isLoading: boolean;
 }
 
@@ -81,5 +83,5 @@ export function useDashboard(teamId: string): DashboardData {
   const costPerPlayer = activePlayers > 0 ? totalSpent / activePlayers : 0;
   const costPerGame = games.length > 0 ? totalSpent / games.length : 0;
 
-  return { players, budget, expenses, games, costPerPlayer, costPerGame, isLoading };
+  return { players, budget, expenses, games, costPerPlayer, costPerGame, activePlayers, totalSpent, isLoading };
 }

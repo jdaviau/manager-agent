@@ -55,17 +55,17 @@ export function BudgetSummary({ budget, expenses }: Props) {
       ) : (
         <>
           <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="rounded-lg bg-muted p-2">
-              <p className="text-xs text-muted-foreground">Total</p>
-              <p className="font-semibold text-sm">${Number(budget.total_amount).toFixed(2)}</p>
+            <div className="rounded-lg bg-muted/60 border p-2.5">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Total</p>
+              <p className="font-semibold text-sm mt-0.5">${Number(budget.total_amount).toFixed(2)}</p>
             </div>
-            <div className="rounded-lg bg-muted p-2">
-              <p className="text-xs text-muted-foreground">Spent</p>
-              <p className="font-semibold text-sm">${totalSpent.toFixed(2)}</p>
+            <div className="rounded-lg bg-muted/60 border p-2.5">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Spent</p>
+              <p className="font-semibold text-sm mt-0.5">${totalSpent.toFixed(2)}</p>
             </div>
-            <div className="rounded-lg bg-muted p-2">
-              <p className="text-xs text-muted-foreground">Left</p>
-              <p className={`font-semibold text-sm ${progressColor}`}>
+            <div className="rounded-lg bg-muted/60 border p-2.5">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Left</p>
+              <p className={`font-semibold text-sm mt-0.5 ${progressColor}`}>
                 ${remaining.toFixed(2)}
               </p>
             </div>
