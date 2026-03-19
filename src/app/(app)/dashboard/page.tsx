@@ -186,7 +186,7 @@ export default function DashboardPage() {
             <ChatPanel teamId={team.id} />
           </div>
           <div className="flex-1 overflow-hidden">
-            <DashboardPanel teamId={team.id} teamName={team.name} teamSeason={team.season} />
+            <DashboardPanel teamId={team.id} />
           </div>
         </div>
 
@@ -195,7 +195,7 @@ export default function DashboardPage() {
           {activeTab === "chat" ? (
             <ChatPanel teamId={team.id} />
           ) : (
-            <DashboardPanel teamId={team.id} teamName={team.name} teamSeason={team.season} />
+            <DashboardPanel teamId={team.id} />
           )}
         </div>
       </div>
