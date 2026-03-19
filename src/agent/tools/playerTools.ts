@@ -1,25 +1,28 @@
 import type { Tool } from "@anthropic-ai/sdk/resources/messages";
+import { assertString, assertOptionalString, assertOptionalDate } from "./validate";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SupabaseClient = any;
+
+const MAX_ROSTER_SIZE = 50;
 
 export const playerToolDefinitions: Tool[] = [
   {
     name: "add_player",
-    description: "Add a new player to the team roster.",
+    description: "Add a new player to the team roster. Maximum 50 players per team.",
     input_schema: {
       type: "object" as const,
       properties: {
         team_id: { type: "string", description: "The team UUID" },
-        name: { type: "string", description: "Player's full name" },
-        jersey_number: { type: "string", description: "Jersey number (optional)" },
-        position: { type: "string", description: "Playing position (optional)" },
+        name: { type: "string", description: "Player's full name (max 100 characters)" },
+        jersey_number: { type: "string", description: "Jersey number, e.g. '7' (optional, max 10 characters)" },
+        position: { type: "string", description: "Playing position (optional, max 100 characters)" },
         status: {
           type: "string",
           enum: ["active", "inactive", "injured"],
           description: "Player status, defaults to active",
         },
         joined_at: { type: "string", description: "Date joined in YYYY-MM-DD format (optional)" },
-        notes: { type: "string", description: "Any additional notes (optional)" },
+        notes: { type: "string", description: "Any additional notes (optional, max 500 characters)" },
       },
       required: ["team_id", "name"],
     },
@@ -47,15 +50,15 @@ export const playerToolDefinitions: Tool[] = [
       type: "object" as const,
       properties: {
         player_id: { type: "string", description: "The player UUID" },
-        name: { type: "string", description: "New name (optional)" },
-        jersey_number: { type: "string", description: "New jersey number (optional)" },
-        position: { type: "string", description: "New position (optional)" },
+        name: { type: "string", description: "New name (optional, max 100 characters)" },
+        jersey_number: { type: "string", description: "New jersey number (optional, max 10 characters)" },
+        position: { type: "string", description: "New position (optional, max 100 characters)" },
         status: {
           type: "string",
           enum: ["active", "inactive", "injured"],
           description: "New status (optional)",
         },
-        notes: { type: "string", description: "Updated notes (optional)" },
+        notes: { type: "string", description: "Updated notes (optional, max 500 characters)" },
       },
       required: ["player_id"],
     },
@@ -78,16 +81,34 @@ type Executor = (input: Input, supabase: SupabaseClient) => Promise<unknown>;
 
 export const playerExecutors: Record<string, Executor> = {
   add_player: async (input, supabase) => {
+    const name = assertString(input.name, "name", { max: 100 });
+    const jerseyNumber = assertOptionalString(input.jersey_number, "jersey_number", 10);
+    const position = assertOptionalString(input.position, "position", 100);
+    const notes = assertOptionalString(input.notes, "notes", 500);
+    const joinedAt = assertOptionalDate(input.joined_at, "joined_at");
+
+    // Enforce roster size limit
+    const { count, error: countError } = await supabase
+      .from("players")
+      .select("id", { count: "exact", head: true })
+      .eq("team_id", input.team_id as string);
+    if (countError) throw new Error(countError.message);
+    if ((count ?? 0) >= MAX_ROSTER_SIZE) {
+      throw new Error(
+        `Roster limit reached. A team may have at most ${MAX_ROSTER_SIZE} players. Remove or deactivate a player first.`
+      );
+    }
+
     const { data, error } = await supabase
       .from("players")
       .insert({
         team_id: input.team_id as string,
-        name: input.name as string,
-        jersey_number: (input.jersey_number as string) ?? null,
-        position: (input.position as string) ?? null,
+        name,
+        jersey_number: jerseyNumber,
+        position,
         status: (input.status as "active" | "inactive" | "injured") ?? "active",
-        joined_at: (input.joined_at as string) ?? null,
-        notes: (input.notes as string) ?? null,
+        joined_at: joinedAt,
+        notes,
       })
       .select()
       .single();
@@ -111,11 +132,16 @@ export const playerExecutors: Record<string, Executor> = {
 
   update_player: async (input, supabase) => {
     const updates: Record<string, unknown> = {};
-    if (input.name !== undefined) updates.name = input.name;
-    if (input.jersey_number !== undefined) updates.jersey_number = input.jersey_number;
-    if (input.position !== undefined) updates.position = input.position;
-    if (input.status !== undefined) updates.status = input.status;
-    if (input.notes !== undefined) updates.notes = input.notes;
+    if (input.name !== undefined)
+      updates.name = assertString(input.name, "name", { max: 100 });
+    if (input.jersey_number !== undefined)
+      updates.jersey_number = assertOptionalString(input.jersey_number, "jersey_number", 10);
+    if (input.position !== undefined)
+      updates.position = assertOptionalString(input.position, "position", 100);
+    if (input.status !== undefined)
+      updates.status = input.status;
+    if (input.notes !== undefined)
+      updates.notes = assertOptionalString(input.notes, "notes", 500);
 
     const { data, error } = await supabase
       .from("players")

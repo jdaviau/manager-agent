@@ -1,5 +1,6 @@
 import type { Tool } from "@anthropic-ai/sdk/resources/messages";
 import type { ExpenseCategory } from "@/types/database";
+import { assertString, assertOptionalString, assertNumber, assertOptionalDate, assertSeason, clampLimit } from "./validate";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SupabaseClient = any;
 
@@ -21,13 +22,13 @@ export const expenseToolDefinitions: Tool[] = [
           enum: ["equipment", "travel", "fees", "facilities", "medical", "uniforms", "other"],
           description: "Expense category",
         },
-        description: { type: "string", description: "Description of the expense" },
-        amount: { type: "number", description: "Expense amount in dollars" },
+        description: { type: "string", description: "Description of the expense (max 200 characters)" },
+        amount: { type: "number", description: "Expense amount in dollars ($0.01 – $100,000)" },
         expense_date: {
           type: "string",
           description: "Date in YYYY-MM-DD format (defaults to today)",
         },
-        notes: { type: "string", description: "Optional additional notes" },
+        notes: { type: "string", description: "Optional additional notes (max 500 characters)" },
       },
       required: ["team_id", "season", "category", "description", "amount"],
     },
@@ -39,7 +40,7 @@ export const expenseToolDefinitions: Tool[] = [
       type: "object" as const,
       properties: {
         team_id: { type: "string", description: "The team UUID" },
-        limit: { type: "number", description: "Max number of results (default 20)" },
+        limit: { type: "number", description: "Max number of results (default 20, max 100)" },
         start_date: { type: "string", description: "Start date filter YYYY-MM-DD (optional)" },
         end_date: { type: "string", description: "End date filter YYYY-MM-DD (optional)" },
       },
@@ -73,12 +74,19 @@ type Executor = (input: Input, supabase: SupabaseClient) => Promise<unknown>;
 
 export const expenseExecutors: Record<string, Executor> = {
   add_expense: async (input, supabase) => {
+    const season = assertSeason(input.season);
+    const description = assertString(input.description, "description", { max: 200 });
+    const amount = assertNumber(input.amount, "amount", { min: 0.01, max: 100_000 });
+    const notes = assertOptionalString(input.notes, "notes", 500);
+    const expenseDate = assertOptionalDate(input.expense_date, "expense_date")
+      ?? new Date().toISOString().split("T")[0];
+
     // Find the budget for linking
     const { data: budget } = await supabase
       .from("budgets")
       .select("id, total_amount")
       .eq("team_id", input.team_id as string)
-      .eq("season", input.season as string)
+      .eq("season", season)
       .maybeSingle();
 
     const { data: expense, error } = await supabase
@@ -87,10 +95,10 @@ export const expenseExecutors: Record<string, Executor> = {
         team_id: input.team_id as string,
         budget_id: budget?.id ?? null,
         category: input.category as ExpenseCategory,
-        description: input.description as string,
-        amount: input.amount as number,
-        expense_date: (input.expense_date as string) ?? new Date().toISOString().split("T")[0],
-        notes: (input.notes as string) ?? null,
+        description,
+        amount,
+        expense_date: expenseDate,
+        notes,
       })
       .select()
       .single();
@@ -113,15 +121,19 @@ export const expenseExecutors: Record<string, Executor> = {
   },
 
   list_expenses: async (input, supabase) => {
+    const limit = clampLimit(input.limit, 100, 20);
+    const startDate = assertOptionalDate(input.start_date, "start_date");
+    const endDate = assertOptionalDate(input.end_date, "end_date");
+
     let query = supabase
       .from("expenses")
       .select("*")
       .eq("team_id", input.team_id as string)
       .order("expense_date", { ascending: false })
-      .limit((input.limit as number) ?? 20);
+      .limit(limit);
 
-    if (input.start_date) query = query.gte("expense_date", input.start_date as string);
-    if (input.end_date) query = query.lte("expense_date", input.end_date as string);
+    if (startDate) query = query.gte("expense_date", startDate);
+    if (endDate) query = query.lte("expense_date", endDate);
 
     const { data, error } = await query;
     if (error) throw new Error(error.message);
@@ -139,12 +151,12 @@ export const expenseExecutors: Record<string, Executor> = {
       .order("expense_date", { ascending: false });
 
     if (input.season) {
-      // Filter by season via budget linkage
+      const season = assertSeason(input.season);
       const { data: budget } = await supabase
         .from("budgets")
         .select("id")
         .eq("team_id", input.team_id as string)
-        .eq("season", input.season as string)
+        .eq("season", season)
         .maybeSingle();
       if (budget) {
         query = query.eq("budget_id", budget.id);
