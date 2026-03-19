@@ -11,9 +11,17 @@ interface Props {
   messages: ChatMessageType[];
   streamingContent: string;
   activeToolName: string | null;
+  isStreaming: boolean;
 }
 
-export function ChatMessages({ messages, streamingContent, activeToolName }: Props) {
+const SUGGESTIONS = [
+  { icon: "👤", text: "Add a player named Alex Johnson, jersey #7" },
+  { icon: "💰", text: "Set our budget to $5,000 for this season" },
+  { icon: "🧾", text: "Log a $200 equipment expense for training bibs" },
+  { icon: "📅", text: "Add a game vs Riverside FC next Friday" },
+];
+
+export function ChatMessages({ messages, streamingContent, activeToolName, isStreaming }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -22,51 +30,75 @@ export function ChatMessages({ messages, streamingContent, activeToolName }: Pro
 
   if (messages.length === 0 && !streamingContent) {
     return (
-      <div className="flex-1 flex items-center justify-center p-6 text-center">
-        <div className="space-y-4 max-w-[220px]">
-          <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 text-2xl mx-auto">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6">
+        <div className="text-center space-y-2">
+          <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 text-xl mx-auto">
             🏆
           </div>
-          <div className="space-y-1.5">
-            <p className="font-semibold text-sm">Welcome, Team Manager!</p>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              I can help you manage your roster, track expenses, and analyze your season.
-            </p>
-          </div>
-          <div className="space-y-1.5 text-left">
-            {[
-              "Add a player named Alex Johnson, jersey #7",
-              "Set our budget to $5,000",
-              "Log a $200 equipment expense",
-            ].map((suggestion) => (
-              <div key={suggestion} className="rounded-lg border border-border bg-muted/40 px-3 py-2">
-                <p className="text-xs text-muted-foreground">&ldquo;{suggestion}&rdquo;</p>
-              </div>
-            ))}
-          </div>
+          <p className="font-semibold text-sm">Welcome, Team Manager!</p>
+          <p className="text-xs text-muted-foreground max-w-[200px] leading-relaxed">
+            Ask me anything about your team or try one of these:
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-2 w-full max-w-[280px]">
+          {SUGGESTIONS.map((s) => (
+            <div
+              key={s.text}
+              className="flex items-start gap-2.5 rounded-xl border border-border/70 bg-white/80 px-3 py-2.5 shadow-xs cursor-default"
+            >
+              <span className="text-base leading-none mt-0.5">{s.icon}</span>
+              <p className="text-xs text-muted-foreground leading-snug">{s.text}</p>
+            </div>
+          ))}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-muted/5">
+    <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-muted/5">
       {messages.map((msg) => (
         <ChatMessage key={msg.id} message={msg} />
       ))}
 
+      {/* Tool call in progress */}
       {activeToolName && (
-        <div className="flex justify-start">
+        <div className="flex gap-2.5">
+          <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs shrink-0 self-end">
+            🏆
+          </div>
           <ToolCallIndicator toolName={activeToolName} />
         </div>
       )}
 
+      {/* Streaming AI response */}
       {streamingContent && (
-        <div className="flex justify-start">
-          <div className="max-w-[85%] rounded-2xl rounded-bl-sm px-4 py-2.5 text-sm bg-muted text-foreground">
-            <div className="prose prose-sm dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+        <div className="flex gap-2.5">
+          <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs shrink-0 self-end">
+            🏆
+          </div>
+          <div className="max-w-[80%] rounded-2xl rounded-bl-sm px-4 py-2.5 text-sm bg-white border border-border/60 shadow-xs text-foreground">
+            <div className="prose prose-sm dark:prose-invert max-w-none leading-relaxed
+              [&>*:first-child]:mt-0 [&>*:last-child]:mb-0
+              [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0.5
+              [&_p]:my-1 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{streamingContent}</ReactMarkdown>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Typing indicator: streaming started but no content or tool yet */}
+      {isStreaming && !streamingContent && !activeToolName && (
+        <div className="flex gap-2.5">
+          <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs shrink-0 self-end">
+            🏆
+          </div>
+          <div className="flex items-center gap-1 px-4 py-3 rounded-2xl rounded-bl-sm bg-white border border-border/60 shadow-xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 animate-bounce [animation-delay:0ms]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 animate-bounce [animation-delay:150ms]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 animate-bounce [animation-delay:300ms]" />
           </div>
         </div>
       )}

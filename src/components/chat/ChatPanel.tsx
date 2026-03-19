@@ -27,6 +27,7 @@ export function ChatPanel({ teamId }: Props) {
         messages={messages}
         streamingContent={streamingContent}
         activeToolName={activeToolName}
+        isStreaming={isStreaming}
       />
       <ChatInput onSend={sendMessage} disabled={isStreaming} />
     </div>
