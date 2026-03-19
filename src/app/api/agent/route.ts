@@ -4,6 +4,7 @@ import { anthropic } from "@/lib/anthropic";
 import { createClient } from "@/lib/supabase/server";
 import { allTools, executeTool } from "@/agent/index";
 import { buildSystemPrompt } from "@/agent/systemPrompt";
+import { isValidUUID, validateMessages, wrapToolResult } from "@/lib/security";
 import type { TeamContext } from "@/agent/types";
 import type { Team, Budget, Expense } from "@/types/database";
 
@@ -24,10 +25,25 @@ export async function POST(req: NextRequest) {
   }
   console.log("[agent] ✅ Auth OK — user:", user.id);
 
-  const { messages, teamId } = (await req.json()) as {
-    messages: MessageParam[];
-    teamId: string;
-  };
+  const body = await req.json();
+  const { teamId } = body as { teamId: unknown; messages: unknown };
+
+  // Validate teamId is a proper UUID before touching the DB
+  if (!isValidUUID(teamId)) {
+    console.log("[agent] ❌ Invalid teamId format");
+    return new Response(JSON.stringify({ error: "Invalid request" }), { status: 400 });
+  }
+
+  // Validate and sanitize the message array
+  let messages: MessageParam[];
+  try {
+    messages = validateMessages(body.messages);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Invalid messages";
+    console.log("[agent] ❌ Message validation failed:", msg);
+    return new Response(JSON.stringify({ error: msg }), { status: 400 });
+  }
+
   console.log("[agent] teamId:", teamId, "| messages:", messages.length);
 
   // Verify team ownership
@@ -162,8 +178,8 @@ async function runAgentLoop(
       if (currentToolId) {
         try {
           const parsedInput = JSON.parse(currentToolInputJson || "{}");
-          // Inject teamId for safety
-          if (!parsedInput.team_id) parsedInput.team_id = teamId;
+          // Always enforce the server-verified teamId — never trust Claude's value
+          parsedInput.team_id = teamId;
           console.log(`[agent] 🔧 Tool call: ${currentToolName}`, parsedInput);
           toolUseBlocks.push({
             id: currentToolId,
@@ -194,7 +210,7 @@ async function runAgentLoop(
         return {
           type: "tool_result" as const,
           tool_use_id: block.id,
-          content: JSON.stringify(outcome.success ? outcome.result : { error: outcome.error }),
+          content: wrapToolResult(JSON.stringify(outcome.success ? outcome.result : { error: outcome.error })),
         };
       })
     );
