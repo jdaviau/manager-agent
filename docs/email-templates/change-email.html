@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confirm your new email address</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body style="margin:0;padding:0;background-color:#EEF2FF;font-family:'Plus Jakarta Sans','Segoe UI',Helvetica,Arial,sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#EEF2FF;padding:40px 16px;">
+    <tr>
+      <td align="center">
+
+        <!-- Card -->
+        <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:480px;">
+
+          <!-- Logo / Header -->
+          <tr>
+            <td align="center" style="padding-bottom:24px;">
+              <table cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td align="center" style="width:56px;height:56px;background-color:#5767E8;border-radius:16px;font-size:26px;line-height:56px;text-align:center;">
+                    🏆
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding-top:12px;">
+                    <span style="font-size:22px;font-weight:700;color:#111827;letter-spacing:-0.3px;">Team Manager</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding-top:4px;">
+                    <span style="font-size:14px;color:#6B7280;">AI-powered sports team management</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Card body -->
+          <tr>
+            <td style="background-color:#FFFFFF;border-radius:16px;border:1px solid #E5E7EB;padding:40px 40px 36px;">
+
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+
+                <!-- Heading -->
+                <tr>
+                  <td style="padding-bottom:8px;">
+                    <h1 style="margin:0;font-size:20px;font-weight:700;color:#111827;letter-spacing:-0.2px;">Confirm your new email address</h1>
+                  </td>
+                </tr>
+
+                <!-- Body text -->
+                <tr>
+                  <td style="padding-bottom:24px;">
+                    <p style="margin:0;font-size:15px;line-height:1.6;color:#4B5563;">
+                      You requested to update the email address on your Team Manager account. Click the button below to confirm this change.
+                    </p>
+                  </td>
+                </tr>
+
+                <!-- New email callout -->
+                <tr>
+                  <td style="padding-bottom:28px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                      <tr>
+                        <td style="background-color:#F5F7FF;border:1px solid #E0E4FC;border-radius:10px;padding:14px 16px;">
+                          <p style="margin:0 0 2px;font-size:12px;color:#6B7280;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">New email address</p>
+                          <p style="margin:0;font-size:15px;color:#111827;font-weight:600;">{{ .Email }}</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- CTA Button -->
+                <tr>
+                  <td align="center" style="padding-bottom:28px;">
+                    <a href="{{ .ConfirmationURL }}"
+                       style="display:inline-block;background-color:#5767E8;color:#FFFFFF;font-size:15px;font-weight:600;text-decoration:none;border-radius:10px;padding:14px 32px;letter-spacing:0.1px;">
+                      Confirm new email
+                    </a>
+                  </td>
+                </tr>
+
+                <!-- Warning box -->
+                <tr>
+                  <td style="padding-bottom:20px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                      <tr>
+                        <td style="background-color:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:12px 16px;">
+                          <p style="margin:0;font-size:13px;color:#92400E;line-height:1.5;">
+                            ⚠️ If you didn't request this change, please contact support immediately — someone may be attempting to access your account.
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Divider -->
+                <tr>
+                  <td style="padding-bottom:20px;border-top:1px solid #F3F4F6;"></td>
+                </tr>
+
+                <!-- Fallback link -->
+                <tr>
+                  <td style="padding-bottom:4px;">
+                    <p style="margin:0;font-size:13px;color:#6B7280;">
+                      If the button doesn't work, copy and paste this link into your browser:
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <p style="margin:0;font-size:12px;color:#5767E8;word-break:break-all;">
+                      {{ .ConfirmationURL }}
+                    </p>
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding-top:24px;">
+              <p style="margin:0;font-size:13px;color:#9CA3AF;">
+                Your current email remains active until this change is confirmed.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
