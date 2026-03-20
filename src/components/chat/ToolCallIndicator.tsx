@@ -6,6 +6,7 @@ const TOOL_LABELS: Record<string, string> = {
   update_player: "Updating player",
   remove_player: "Removing player",
   set_budget: "Setting budget",
+  set_current_budget: "Switching active budget",
   get_budget_summary: "Checking budget",
   add_expense: "Logging expense",
   list_expenses: "Loading expenses",

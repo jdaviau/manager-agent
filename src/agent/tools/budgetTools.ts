@@ -7,7 +7,7 @@ export const budgetToolDefinitions: Tool[] = [
   {
     name: "set_budget",
     description:
-      "Set or update the team's budget for a season. Creates the budget if it doesn't exist, updates it if it does.",
+      "Set or update the team's budget for a season. Creates the budget if it doesn't exist, updates it if it does. Automatically marks it as the current/active budget.",
     input_schema: {
       type: "object" as const,
       properties: {
@@ -20,22 +20,57 @@ export const budgetToolDefinitions: Tool[] = [
     },
   },
   {
-    name: "get_budget_summary",
+    name: "set_current_budget",
     description:
-      "Get the budget summary for a season, including total spent and breakdown by expense category.",
+      "Switch the active/current budget to a different season. Use this when the manager wants to work with a prior or future season's budget.",
     input_schema: {
       type: "object" as const,
       properties: {
         team_id: { type: "string", description: "The team UUID" },
-        season: { type: "string", description: "The season identifier" },
+        season: { type: "string", description: "The season to make current, e.g. '2024-2025'" },
       },
       required: ["team_id", "season"],
+    },
+  },
+  {
+    name: "get_budget_summary",
+    description:
+      "Get the budget summary including total spent and breakdown by expense category. Defaults to the current/active budget if no season is specified.",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        team_id: { type: "string", description: "The team UUID" },
+        season: { type: "string", description: "The season identifier (optional — defaults to current budget)" },
+      },
+      required: ["team_id"],
     },
   },
 ];
 
 type Input = Record<string, unknown>;
 type Executor = (input: Input, supabase: SupabaseClient) => Promise<unknown>;
+
+/** Marks the given budget as current and clears the flag on all others for the team. */
+async function makeCurrentBudget(
+  teamId: string,
+  budgetId: string,
+  supabase: SupabaseClient
+): Promise<void> {
+  // Clear current flag on all budgets for this team
+  await supabase
+    .from("budgets")
+    .update({ is_current: false })
+    .eq("team_id", teamId)
+    .neq("id", budgetId);
+
+  // Set current flag on the target budget
+  const { error } = await supabase
+    .from("budgets")
+    .update({ is_current: true })
+    .eq("id", budgetId);
+
+  if (error) throw new Error(error.message);
+}
 
 export const budgetExecutors: Record<string, Executor> = {
   set_budget: async (input, supabase) => {
@@ -57,26 +92,63 @@ export const budgetExecutors: Record<string, Executor> = {
       .select()
       .single();
     if (error) throw new Error(error.message);
-    return { budget: data };
+
+    await makeCurrentBudget(input.team_id as string, data.id, supabase);
+
+    return { budget: { ...data, is_current: true } };
   },
 
-  get_budget_summary: async (input, supabase) => {
+  set_current_budget: async (input, supabase) => {
     const season = assertSeason(input.season);
 
-    const { data: budget, error: budgetError } = await supabase
+    const { data: budget, error } = await supabase
       .from("budgets")
-      .select("*")
+      .select("id, season")
       .eq("team_id", input.team_id as string)
       .eq("season", season)
       .maybeSingle();
 
-    if (budgetError || !budget) {
+    if (error) throw new Error(error.message);
+    if (!budget) throw new Error(`No budget found for season "${season}". Use set_budget to create one first.`);
+
+    await makeCurrentBudget(input.team_id as string, budget.id, supabase);
+
+    return { message: `Budget for ${season} is now the active budget.`, budget_id: budget.id };
+  },
+
+  get_budget_summary: async (input, supabase) => {
+    let budget: Record<string, unknown> | null = null;
+
+    if (input.season) {
+      const season = assertSeason(input.season);
+      const { data, error } = await supabase
+        .from("budgets")
+        .select("*")
+        .eq("team_id", input.team_id as string)
+        .eq("season", season)
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      budget = data;
+    } else {
+      const { data, error } = await supabase
+        .from("budgets")
+        .select("*")
+        .eq("team_id", input.team_id as string)
+        .eq("is_current", true)
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      budget = data;
+    }
+
+    if (!budget) {
       return {
         budget: null,
         total_spent: 0,
         remaining: null,
         spent_by_category: {},
-        message: "No budget set for this season",
+        message: input.season
+          ? `No budget set for season "${input.season}"`
+          : "No active budget. Use set_budget to create one.",
       };
     }
 

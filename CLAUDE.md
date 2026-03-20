@@ -1,6 +1,6 @@
 # Manager-Agent
 
-A sports team management web app powered by a Claude AI agent. Coaches chat naturally to manage players, budget, and expenses.
+A sports team management web app powered by a Claude AI agent. Team managers chat naturally to manage players, budget, and expenses.
 
 ## Tech Stack
 - **Next.js 16** (App Router, TypeScript, React 19)

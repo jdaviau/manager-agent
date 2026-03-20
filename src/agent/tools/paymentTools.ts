@@ -4,8 +4,7 @@ import {
   assertString,
   assertOptionalString,
   assertNumber,
-  assertOptionalNumber,
-  assertOptionalDate,
+assertOptionalDate,
   assertSeason,
   clampLimit,
 } from "./validate";
@@ -136,7 +135,7 @@ export const paymentExecutors: Record<string, Executor> = {
     // Resolve player
     const player = await resolvePlayerByName(input.team_id as string, playerName, supabase);
 
-    // Optionally resolve budget_id
+    // Resolve budget_id: use specified season, otherwise fall back to current budget
     let budgetId: string | null = null;
     if (input.season) {
       const season = assertSeason(input.season);
@@ -145,6 +144,14 @@ export const paymentExecutors: Record<string, Executor> = {
         .select("id")
         .eq("team_id", input.team_id as string)
         .eq("season", season)
+        .maybeSingle();
+      budgetId = budget?.id ?? null;
+    } else {
+      const { data: budget } = await supabase
+        .from("budgets")
+        .select("id")
+        .eq("team_id", input.team_id as string)
+        .eq("is_current", true)
         .maybeSingle();
       budgetId = budget?.id ?? null;
     }
@@ -246,6 +253,14 @@ export const paymentExecutors: Record<string, Executor> = {
         .select("id")
         .eq("team_id", input.team_id as string)
         .eq("season", season)
+        .maybeSingle();
+      if (budget) query = query.eq("budget_id", budget.id);
+    } else {
+      const { data: budget } = await supabase
+        .from("budgets")
+        .select("id")
+        .eq("team_id", input.team_id as string)
+        .eq("is_current", true)
         .maybeSingle();
       if (budget) query = query.eq("budget_id", budget.id);
     }

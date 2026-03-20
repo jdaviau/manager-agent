@@ -35,42 +35,33 @@ export function useDashboard(teamId: string): DashboardData {
       supabase.from("games").select("*").eq("team_id", teamId).order("game_date"),
     ]);
 
-    const { data: teamRaw } = await supabase
-      .from("teams")
-      .select("season")
-      .eq("id", teamId)
-      .maybeSingle();
-    const team = teamRaw as { season: string | null } | null;
-
     let budgetData: Budget | null = null;
     let expensesData: Expense[] = [];
     let paymentsData: PlayerPayment[] = [];
 
-    if (team?.season) {
-      const { data: budgetRaw } = await supabase
-        .from("budgets")
+    const { data: budgetRaw } = await supabase
+      .from("budgets")
+      .select("*")
+      .eq("team_id", teamId)
+      .eq("is_current", true)
+      .maybeSingle();
+    budgetData = (budgetRaw as Budget | null) ?? null;
+
+    if (budgetData) {
+      const { data: expensesRaw } = await supabase
+        .from("expenses")
         .select("*")
-        .eq("team_id", teamId)
-        .eq("season", team.season)
-        .maybeSingle();
-      budgetData = (budgetRaw as Budget | null) ?? null;
-
-      if (budgetData) {
-        const { data: expensesRaw } = await supabase
-          .from("expenses")
-          .select("*")
-          .eq("budget_id", budgetData.id)
-          .order("expense_date", { ascending: false });
-        expensesData = (expensesRaw as Expense[] | null) ?? [];
-
-        const { data: paymentsRaw } = await supabase
-          .from("player_payments")
-          .select("*")
-          .eq("budget_id", budgetData.id)
-          .order("payment_date", { ascending: false });
-        paymentsData = (paymentsRaw as PlayerPayment[] | null) ?? [];
-      }
+        .eq("budget_id", budgetData.id)
+        .order("expense_date", { ascending: false });
+      expensesData = (expensesRaw as Expense[] | null) ?? [];
     }
+
+    const { data: paymentsRaw } = await supabase
+      .from("player_payments")
+      .select("*")
+      .eq("team_id", teamId)
+      .order("payment_date", { ascending: false });
+    paymentsData = (paymentsRaw as PlayerPayment[] | null) ?? [];
 
     setPlayers((playersRaw as Player[] | null) ?? []);
     setBudget(budgetData);

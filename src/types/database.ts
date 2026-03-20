@@ -43,6 +43,7 @@ export interface Budget {
   team_id: string;
   season: string;
   total_amount: number;
+  is_current: boolean;
   notes: string | null;
   created_at: string;
   updated_at: string;
