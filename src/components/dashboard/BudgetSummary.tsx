@@ -17,11 +17,12 @@ const CATEGORY_COLORS: Record<ExpenseCategory, string> = {
 interface Props {
   budget: Budget | null;
   expenses: Expense[];
+  totalCollected: number;
 }
 
-export function BudgetSummary({ budget, expenses }: Props) {
+export function BudgetSummary({ budget, expenses, totalCollected }: Props) {
   const totalSpent = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
-  const remaining = budget ? Number(budget.total_amount) - totalSpent : 0;
+  const remaining = budget ? Number(budget.total_amount) - totalSpent + totalCollected : 0;
   const percentUsed = budget
     ? Math.min(Math.round((totalSpent / Number(budget.total_amount)) * 100), 100)
     : 0;
@@ -64,12 +65,18 @@ export function BudgetSummary({ budget, expenses }: Props) {
               <p className="font-semibold text-sm mt-0.5">${totalSpent.toFixed(2)}</p>
             </div>
             <div className="rounded-lg bg-muted/60 border p-2.5">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Left</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Net Left</p>
               <p className={`font-semibold text-sm mt-0.5 ${progressColor}`}>
                 ${remaining.toFixed(2)}
               </p>
             </div>
           </div>
+
+          {totalCollected > 0 && (
+            <p className="text-xs text-emerald-600 font-medium text-right">
+              +${totalCollected.toFixed(2)} collected from players
+            </p>
+          )}
 
           <div className="space-y-1">
             <div className="flex justify-between text-xs text-muted-foreground">

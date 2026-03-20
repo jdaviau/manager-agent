@@ -6,6 +6,7 @@ import { PlayerList } from "./PlayerList";
 import { BudgetSummary } from "./BudgetSummary";
 import { ExpenseList } from "./ExpenseList";
 import { GamesList } from "./GamesList";
+import { PaymentList } from "./PaymentList";
 import { StatsCards } from "./StatsCards";
 import { useDashboard } from "@/hooks/useDashboard";
 
@@ -14,7 +15,7 @@ interface Props {
 }
 
 export function DashboardPanel({ teamId }: Props) {
-  const { players, budget, expenses, games, costPerPlayer, costPerGame, activePlayers, totalSpent } =
+  const { players, budget, expenses, games, payments, costPerPlayer, costPerGame, activePlayers, totalSpent, totalCollected } =
     useDashboard(teamId);
 
   return (
@@ -29,6 +30,7 @@ export function DashboardPanel({ teamId }: Props) {
             totalPlayers={players.length}
             budgetTotal={budget ? Number(budget.total_amount) : null}
             budgetSpent={totalSpent}
+            totalCollected={totalCollected}
           />
 
           <Tabs defaultValue="players">
@@ -45,6 +47,9 @@ export function DashboardPanel({ teamId }: Props) {
               <TabsTrigger value="games" className="flex-1 text-xs">
                 Games
               </TabsTrigger>
+              <TabsTrigger value="payments" className="flex-1 text-xs">
+                Payments
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="players" className="mt-3">
@@ -54,7 +59,7 @@ export function DashboardPanel({ teamId }: Props) {
             </TabsContent>
             <TabsContent value="budget" className="mt-3">
               <div className="rounded-xl border bg-white p-4 shadow-sm">
-                <BudgetSummary budget={budget} expenses={expenses} />
+                <BudgetSummary budget={budget} expenses={expenses} totalCollected={totalCollected} />
               </div>
             </TabsContent>
             <TabsContent value="expenses" className="mt-3">
@@ -65,6 +70,11 @@ export function DashboardPanel({ teamId }: Props) {
             <TabsContent value="games" className="mt-3">
               <div className="rounded-xl border bg-white p-4 shadow-sm">
                 <GamesList games={games} />
+              </div>
+            </TabsContent>
+            <TabsContent value="payments" className="mt-3">
+              <div className="rounded-xl border bg-white p-4 shadow-sm">
+                <PaymentList payments={payments} players={players} />
               </div>
             </TabsContent>
           </Tabs>

@@ -76,6 +76,22 @@ export interface Game {
   updated_at: string;
 }
 
+export type PaymentStatus = "outstanding" | "partial" | "paid";
+
+export interface PlayerPayment {
+  id: string;
+  team_id: string;
+  player_id: string;
+  budget_id: string | null;
+  amount: number;
+  payment_date: string;
+  status: PaymentStatus;
+  description: string;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 // Generic Supabase DB type used by createClient
 export interface Database {
   public: {
@@ -86,6 +102,7 @@ export interface Database {
       budgets: { Row: Budget; Insert: Partial<Budget>; Update: Partial<Budget> };
       expenses: { Row: Expense; Insert: Partial<Expense>; Update: Partial<Expense> };
       games: { Row: Game; Insert: Partial<Game>; Update: Partial<Game> };
+      player_payments: { Row: PlayerPayment; Insert: Partial<PlayerPayment>; Update: Partial<PlayerPayment> };
     };
     Enums: {
       expense_category: ExpenseCategory;

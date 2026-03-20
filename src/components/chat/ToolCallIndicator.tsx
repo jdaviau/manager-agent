@@ -16,6 +16,10 @@ const TOOL_LABELS: Record<string, string> = {
   cost_per_player: "Calculating cost per player",
   cost_per_game: "Calculating cost per game",
   financial_summary: "Generating summary",
+  add_player_payment: "Logging payment",
+  update_player_payment: "Updating payment",
+  list_player_payments: "Loading payments",
+  get_payment_summary: "Summarizing payments",
 };
 
 interface Props {

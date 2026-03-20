@@ -7,6 +7,7 @@ import { budgetToolDefinitions, budgetExecutors } from "./tools/budgetTools";
 import { expenseToolDefinitions, expenseExecutors } from "./tools/expenseTools";
 import { gameToolDefinitions, gameExecutors } from "./tools/gameTools";
 import { analysisToolDefinitions, analysisExecutors } from "./tools/analysisTools";
+import { paymentToolDefinitions, paymentExecutors } from "./tools/paymentTools";
 
 export const allTools: Tool[] = [
   ...playerToolDefinitions,
@@ -14,6 +15,7 @@ export const allTools: Tool[] = [
   ...expenseToolDefinitions,
   ...gameToolDefinitions,
   ...analysisToolDefinitions,
+  ...paymentToolDefinitions,
 ];
 
 type Executor = (
@@ -27,6 +29,7 @@ export const allExecutors: Record<string, Executor> = {
   ...expenseExecutors,
   ...gameExecutors,
   ...analysisExecutors,
+  ...paymentExecutors,
 };
 
 export async function executeTool(

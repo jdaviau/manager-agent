@@ -9,6 +9,7 @@ interface Props {
   totalPlayers: number;
   budgetTotal: number | null;
   budgetSpent: number;
+  totalCollected: number;
 }
 
 interface MetricCardProps {
@@ -49,15 +50,17 @@ function MetricCard({ icon, label, value, sub, subColor = "text-muted-foreground
   );
 }
 
-export function StatsCards({ costPerPlayer, costPerGame, activePlayers, totalPlayers, budgetTotal, budgetSpent }: Props) {
-  const remaining = budgetTotal !== null ? budgetTotal - budgetSpent : null;
+export function StatsCards({ costPerPlayer, costPerGame, activePlayers, totalPlayers, budgetTotal, budgetSpent, totalCollected }: Props) {
+  const remaining = budgetTotal !== null ? budgetTotal - budgetSpent + totalCollected : null;
   const percentUsed = budgetTotal && budgetTotal > 0 ? Math.round((budgetSpent / budgetTotal) * 100) : null;
 
   const budgetValue = remaining !== null ? `$${remaining.toFixed(0)}` : "—";
   const budgetSub =
-    percentUsed !== null
-      ? `${percentUsed}% of $${budgetTotal!.toFixed(0)} used`
-      : "No budget set";
+    totalCollected > 0
+      ? `$${totalCollected.toFixed(0)} collected from players`
+      : percentUsed !== null
+        ? `${percentUsed}% of $${budgetTotal!.toFixed(0)} used`
+        : "No budget set";
   const budgetSubColor =
     percentUsed === null
       ? "text-muted-foreground"
