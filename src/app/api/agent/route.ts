@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import type { MessageParam } from "@anthropic-ai/sdk/resources/messages";
-import { anthropic } from "@/lib/anthropic";
+import { anthropic, AGENT_MODEL } from "@/lib/anthropic";
 import { createClient } from "@/lib/supabase/server";
 import { allTools, executeTool } from "@/agent/index";
 import { buildSystemPrompt } from "@/agent/systemPrompt";
@@ -145,7 +145,7 @@ async function runAgentLoop(
 
   console.log(`[agent] 🤖 Calling Claude (depth=${depth})...`);
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-6",
+    model: AGENT_MODEL,
     max_tokens: 4096,
     system: systemPrompt,
     messages,
