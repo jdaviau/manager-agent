@@ -2,6 +2,7 @@
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
 import { PlayerList } from "./PlayerList";
 import { BudgetSummary } from "./BudgetSummary";
 import { ExpenseList } from "./ExpenseList";
@@ -43,29 +44,19 @@ export function DashboardPanel({ teamId }: Props) {
             </TabsList>
 
             <TabsContent value="players" className="mt-3">
-              <div className="rounded-xl border bg-card p-4 shadow-xs">
-                <PlayerList players={players} />
-              </div>
+              <Card><CardContent className="pt-4 px-0"><PlayerList players={players} /></CardContent></Card>
             </TabsContent>
             <TabsContent value="budget" className="mt-3">
-              <div className="rounded-xl border bg-card p-4 shadow-xs">
-                <BudgetSummary budget={budget} expenses={expenses} totalCollected={totalCollected} />
-              </div>
+              <Card><CardContent className="pt-4"><BudgetSummary budget={budget} expenses={expenses} totalCollected={totalCollected} /></CardContent></Card>
             </TabsContent>
             <TabsContent value="expenses" className="mt-3">
-              <div className="rounded-xl border bg-card p-4 shadow-xs">
-                <ExpenseList expenses={expenses} />
-              </div>
+              <Card><CardContent className="pt-4 px-0"><ExpenseList expenses={expenses} /></CardContent></Card>
             </TabsContent>
             <TabsContent value="games" className="mt-3">
-              <div className="rounded-xl border bg-card p-4 shadow-xs">
-                <GamesList games={games} />
-              </div>
+              <Card><CardContent className="pt-4 px-0"><GamesList games={games} /></CardContent></Card>
             </TabsContent>
             <TabsContent value="payments" className="mt-3">
-              <div className="rounded-xl border bg-card p-4 shadow-xs">
-                <PaymentList payments={payments} players={players} />
-              </div>
+              <Card><CardContent className="pt-4 px-0"><PaymentList payments={payments} players={players} /></CardContent></Card>
             </TabsContent>
           </Tabs>
         </div>

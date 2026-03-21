@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar } from "lucide-react";
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 import type { Game } from "@/types/database";
 
 function ResultBadge({ result }: { result: string | null }) {
@@ -8,15 +8,11 @@ function ResultBadge({ result }: { result: string | null }) {
   const isWin = result.toUpperCase().startsWith("W");
   const isLoss = result.toUpperCase().startsWith("L");
   return (
-    <span
-      className={`text-xs font-medium px-1.5 py-0.5 rounded ${
-        isWin
-          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-          : isLoss
-            ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-            : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-      }`}
-    >
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+      isWin ? "bg-emerald-100 text-emerald-700" :
+      isLoss ? "bg-red-100 text-red-700" :
+      "bg-muted text-muted-foreground"
+    }`}>
       {result}
     </span>
   );
@@ -27,64 +23,56 @@ interface Props {
 }
 
 export function GamesList({ games }: Props) {
+  if (games.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground text-center py-6">
+        No games scheduled. Ask the assistant to add one!
+      </p>
+    );
+  }
+
   const today = new Date().toISOString().split("T")[0];
-  const upcoming = games.filter((g) => g.game_date >= today).slice(0, 3);
-  const past = games.filter((g) => g.game_date < today).slice(0, 5);
+  const upcoming = games.filter((g) => g.game_date >= today);
+  const past = [...games.filter((g) => g.game_date < today)].reverse();
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-1.5 text-sm font-medium">
-        <Calendar className="h-4 w-4" />
-        Schedule
-      </div>
-
-      {games.length === 0 ? (
-        <p className="text-sm text-muted-foreground py-4 text-center">
-          No games scheduled. Ask the assistant to add one!
-        </p>
-      ) : (
-        <>
-          {upcoming.length > 0 && (
-            <div className="space-y-1.5">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Upcoming
-              </p>
-              {upcoming.map((game) => (
-                <div key={game.id} className="rounded-lg border p-2.5 text-sm space-y-0.5">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">
-                      {game.opponent ? `vs ${game.opponent}` : "Training / Session"}
-                    </span>
-                    <span className="text-xs text-muted-foreground">{game.game_date}</span>
-                  </div>
-                  {game.location && (
-                    <p className="text-xs text-muted-foreground">{game.location}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {past.length > 0 && (
-            <div className="space-y-1.5">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Recent Results
-              </p>
-              {past.map((game) => (
-                <div key={game.id} className="flex items-center gap-2 text-sm">
-                  <ResultBadge result={game.result} />
-                  <span className="flex-1 truncate">
-                    {game.opponent ? `vs ${game.opponent}` : "Session"}
-                  </span>
-                  <span className="text-xs text-muted-foreground shrink-0">
-                    {game.game_date}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </>
-      )}
-    </div>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="text-xs">Opponent</TableHead>
+          <TableHead className="text-xs hidden sm:table-cell">Location</TableHead>
+          <TableHead className="text-xs">Date</TableHead>
+          <TableHead className="text-xs">Result</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {upcoming.length > 0 && upcoming.map((game) => (
+          <TableRow key={game.id}>
+            <TableCell className="font-medium">
+              {game.opponent ? `vs ${game.opponent}` : "Session"}
+            </TableCell>
+            <TableCell className="text-muted-foreground text-xs hidden sm:table-cell truncate max-w-[120px]">
+              {game.location ?? "—"}
+            </TableCell>
+            <TableCell className="text-xs text-muted-foreground tabular-nums">{game.game_date}</TableCell>
+            <TableCell>
+              <span className="text-xs text-muted-foreground">Upcoming</span>
+            </TableCell>
+          </TableRow>
+        ))}
+        {past.length > 0 && past.map((game) => (
+          <TableRow key={game.id}>
+            <TableCell className="font-medium">
+              {game.opponent ? `vs ${game.opponent}` : "Session"}
+            </TableCell>
+            <TableCell className="text-muted-foreground text-xs hidden sm:table-cell truncate max-w-[120px]">
+              {game.location ?? "—"}
+            </TableCell>
+            <TableCell className="text-xs text-muted-foreground tabular-nums">{game.game_date}</TableCell>
+            <TableCell><ResultBadge result={game.result} /></TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 }
