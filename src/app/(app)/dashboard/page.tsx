@@ -7,6 +7,7 @@ import { DashboardPanel } from "@/components/dashboard/DashboardPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MessageSquare, LayoutDashboard, LogOut } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 import type { Team } from "@/types/database";
 
 export default function DashboardPage() {
@@ -147,24 +148,28 @@ export default function DashboardPage() {
     <div className="flex flex-col h-screen bg-background">
 
       {/* Top bar */}
-      <header className="flex items-center justify-between px-4 h-14 border-b bg-white shrink-0 shadow-sm">
-        <div className="flex items-center gap-2.5">
-          <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary text-white text-xs font-bold shadow-sm">
+      <header className="flex items-center justify-between px-4 h-14 border-b bg-card shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-white text-sm shadow-sm shrink-0">
             🏆
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="font-semibold text-sm">{team.name}</span>
-            {team.sport && (
-              <span className="hidden sm:inline text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                {team.sport}
-              </span>
-            )}
-            {team.season && (
-              <span className="hidden sm:inline text-xs text-muted-foreground">
-                {team.season}
-              </span>
-            )}
-          </div>
+          <span className="font-semibold text-sm">{team.name}</span>
+          {(team.sport || team.season) && (
+            <>
+              <Separator orientation="vertical" className="h-4" />
+              <div className="hidden sm:flex items-center gap-2">
+                {team.sport && (
+                  <span className="text-xs text-muted-foreground">{team.sport}</span>
+                )}
+                {team.sport && team.season && (
+                  <span className="text-muted-foreground/40 text-xs">·</span>
+                )}
+                {team.season && (
+                  <span className="text-xs text-muted-foreground">{team.season}</span>
+                )}
+              </div>
+            </>
+          )}
         </div>
         <Button
           variant="ghost"

@@ -1,6 +1,8 @@
 "use client";
 
 import { Users, DollarSign, TrendingDown, TrendingUp } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import type { Budget } from "@/types/database";
 
 interface Props {
@@ -12,121 +14,136 @@ interface Props {
   totalOutstanding: number;
 }
 
-interface MetricCardProps {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  sub: string;
-  subColor?: string;
-  iconColor: string;
-  trend?: { label: string; positive: boolean } | null;
-}
-
-function MetricCard({ icon, label, value, sub, subColor = "text-muted-foreground", iconColor, trend }: MetricCardProps) {
-  return (
-    <div className="group/card relative rounded-xl ring-1 ring-foreground/10 shadow-xs bg-gradient-to-t from-primary/5 to-card p-4 flex flex-col gap-3 overflow-hidden transition-shadow hover:shadow-sm">
-      <div className="flex items-start justify-between gap-2">
-        <span className="text-xs font-medium text-muted-foreground leading-tight">{label}</span>
-        <div className={`flex items-center justify-center w-7 h-7 rounded-lg ${iconColor} shrink-0`}>
-          {icon}
-        </div>
-      </div>
-      <div>
-        <p className="text-2xl font-bold tracking-tight leading-none">{value}</p>
-        <div className="flex items-center gap-2 mt-1.5">
-          <p className={`text-xs ${subColor}`}>{sub}</p>
-          {trend && (
-            <span className={`inline-flex items-center gap-0.5 text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
-              trend.positive
-                ? "bg-emerald-100 text-emerald-700"
-                : "bg-red-100 text-red-600"
-            }`}>
-              {trend.positive ? "▲" : "▼"} {trend.label}
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+function fmt(n: number) {
+  return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
 export function StatsCards({ activePlayers, totalPlayers, budget, totalSpent, totalCollected, totalOutstanding }: Props) {
   const budgetTotal = budget ? Number(budget.total_amount) : null;
   const netRemaining = budgetTotal !== null ? budgetTotal - totalSpent + totalCollected : null;
-
-  const percentSpent = budgetTotal && budgetTotal > 0
-    ? Math.round((totalSpent / budgetTotal) * 100)
-    : null;
-
-  const expenseSubColor =
-    percentSpent === null
-      ? "text-muted-foreground"
-      : percentSpent >= 90
-        ? "text-red-600"
-        : percentSpent >= 70
-          ? "text-yellow-600"
-          : "text-emerald-600";
-
+  const percentSpent = budgetTotal && budgetTotal > 0 ? Math.round((totalSpent / budgetTotal) * 100) : null;
   const inactivePlayers = totalPlayers - activePlayers;
 
   return (
-    <div className="grid grid-cols-2 gap-3">
-      <MetricCard
-        icon={<Users className="h-3.5 w-3.5" />}
-        label="Active Players"
-        value={String(activePlayers)}
-        sub={totalPlayers === 0 ? "No roster yet" : inactivePlayers > 0 ? `${inactivePlayers} inactive` : "Full roster active"}
-        iconColor="bg-blue-100 text-blue-600"
-      />
-      <MetricCard
-        icon={<DollarSign className="h-3.5 w-3.5" />}
-        label="Budget"
-        value={budgetTotal !== null ? `$${budgetTotal.toLocaleString()}` : "—"}
-        sub={
-          budget
-            ? netRemaining !== null
-              ? `$${netRemaining.toFixed(0)} net remaining`
-              : budget.season
-            : "No budget set"
-        }
-        subColor={
-          netRemaining === null
-            ? "text-muted-foreground"
-            : netRemaining < 0
-              ? "text-red-600"
-              : "text-emerald-600"
-        }
-        iconColor="bg-emerald-100 text-emerald-600"
-      />
-      <MetricCard
-        icon={<TrendingDown className="h-3.5 w-3.5" />}
-        label="Expenses"
-        value={totalSpent > 0 ? `$${totalSpent.toLocaleString()}` : "—"}
-        sub={
-          percentSpent !== null
-            ? `${percentSpent}% of $${budgetTotal!.toLocaleString()} budget`
-            : totalSpent > 0
-              ? "No budget set"
-              : "No expenses yet"
-        }
-        subColor={expenseSubColor}
-        iconColor="bg-red-100 text-red-500"
-        trend={percentSpent !== null && percentSpent >= 70 ? { label: `${100 - percentSpent}% left`, positive: false } : null}
-      />
-      <MetricCard
-        icon={<TrendingUp className="h-3.5 w-3.5" />}
-        label="Collected"
-        value={totalCollected > 0 ? `$${totalCollected.toLocaleString()}` : "—"}
-        sub={
-          totalOutstanding > 0
-            ? `$${totalOutstanding.toLocaleString()} outstanding`
-            : totalCollected > 0
-              ? "All payments received"
-              : "No payments yet"
-        }
-        subColor={totalOutstanding > 0 ? "text-amber-600" : "text-muted-foreground"}
-        iconColor="bg-violet-100 text-violet-600"
-      />
+    <div className="grid grid-cols-2 gap-3 @container">
+      {/* Active Players */}
+      <Card className="bg-gradient-to-t from-primary/5 to-card shadow-xs">
+        <CardHeader>
+          <CardDescription className="flex items-center gap-1.5">
+            <Users className="h-3.5 w-3.5" />
+            Active Players
+          </CardDescription>
+          <CardTitle className="text-3xl font-bold tabular-nums">{activePlayers}</CardTitle>
+          <CardAction>
+            <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-blue-100 text-blue-600 shrink-0">
+              <Users className="h-3.5 w-3.5" />
+            </div>
+          </CardAction>
+        </CardHeader>
+        <CardFooter>
+          <span className="text-xs text-muted-foreground">
+            {totalPlayers === 0
+              ? "No roster yet"
+              : inactivePlayers > 0
+                ? `${inactivePlayers} inactive`
+                : "Full roster active"}
+          </span>
+        </CardFooter>
+      </Card>
+
+      {/* Budget */}
+      <Card className="bg-gradient-to-t from-primary/5 to-card shadow-xs">
+        <CardHeader>
+          <CardDescription className="flex items-center gap-1.5">
+            <DollarSign className="h-3.5 w-3.5" />
+            Budget
+          </CardDescription>
+          <CardTitle className="text-3xl font-bold tabular-nums">
+            {budgetTotal !== null ? `$${fmt(budgetTotal)}` : "—"}
+          </CardTitle>
+          <CardAction>
+            <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-emerald-100 text-emerald-600 shrink-0">
+              <DollarSign className="h-3.5 w-3.5" />
+            </div>
+          </CardAction>
+        </CardHeader>
+        <CardFooter>
+          {netRemaining !== null ? (
+            <span className={`text-xs font-medium ${netRemaining < 0 ? "text-red-600" : "text-emerald-600"}`}>
+              ${fmt(netRemaining)} net remaining
+            </span>
+          ) : (
+            <span className="text-xs text-muted-foreground">
+              {budget ? budget.season : "No budget set"}
+            </span>
+          )}
+        </CardFooter>
+      </Card>
+
+      {/* Expenses */}
+      <Card className="bg-gradient-to-t from-primary/5 to-card shadow-xs">
+        <CardHeader>
+          <CardDescription className="flex items-center gap-1.5">
+            <TrendingDown className="h-3.5 w-3.5" />
+            Expenses
+          </CardDescription>
+          <CardTitle className="text-3xl font-bold tabular-nums">
+            {totalSpent > 0 ? `$${fmt(totalSpent)}` : "—"}
+          </CardTitle>
+          <CardAction>
+            <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-red-100 text-red-500 shrink-0">
+              <TrendingDown className="h-3.5 w-3.5" />
+            </div>
+          </CardAction>
+        </CardHeader>
+        <CardFooter className="flex items-center justify-between gap-2">
+          <span className={`text-xs ${
+            percentSpent === null
+              ? "text-muted-foreground"
+              : percentSpent >= 90
+                ? "text-red-600 font-medium"
+                : percentSpent >= 70
+                  ? "text-yellow-600 font-medium"
+                  : "text-muted-foreground"
+          }`}>
+            {percentSpent !== null
+              ? `${percentSpent}% of $${fmt(budgetTotal!)} budget`
+              : totalSpent > 0 ? "No budget set" : "No expenses yet"}
+          </span>
+          {percentSpent !== null && percentSpent >= 70 && (
+            <Badge variant="destructive" className="text-[10px] px-1.5 py-0 h-4">
+              {100 - percentSpent}% left
+            </Badge>
+          )}
+        </CardFooter>
+      </Card>
+
+      {/* Collected */}
+      <Card className="bg-gradient-to-t from-primary/5 to-card shadow-xs">
+        <CardHeader>
+          <CardDescription className="flex items-center gap-1.5">
+            <TrendingUp className="h-3.5 w-3.5" />
+            Collected
+          </CardDescription>
+          <CardTitle className="text-3xl font-bold tabular-nums">
+            {totalCollected > 0 ? `$${fmt(totalCollected)}` : "—"}
+          </CardTitle>
+          <CardAction>
+            <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-violet-100 text-violet-600 shrink-0">
+              <TrendingUp className="h-3.5 w-3.5" />
+            </div>
+          </CardAction>
+        </CardHeader>
+        <CardFooter>
+          <span className={`text-xs ${totalOutstanding > 0 ? "text-amber-600 font-medium" : "text-muted-foreground"}`}>
+            {totalOutstanding > 0
+              ? `$${fmt(totalOutstanding)} outstanding`
+              : totalCollected > 0
+                ? "All payments received"
+                : "No payments yet"}
+          </span>
+        </CardFooter>
+      </Card>
     </div>
   );
 }
