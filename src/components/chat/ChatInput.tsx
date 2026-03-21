@@ -4,13 +4,16 @@ import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { SendHorizonal } from "lucide-react";
+import Link from "next/link";
 
 interface Props {
   onSend: (message: string) => void;
   disabled?: boolean;
+  isAtLimit?: boolean;
+  limitResetDate?: string;
 }
 
-export function ChatInput({ onSend, disabled }: Props) {
+export function ChatInput({ onSend, disabled, isAtLimit, limitResetDate }: Props) {
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -37,6 +40,20 @@ export function ChatInput({ onSend, disabled }: Props) {
     const el = e.target;
     el.style.height = "auto";
     el.style.height = `${Math.min(el.scrollHeight, 140)}px`;
+  }
+
+  if (isAtLimit) {
+    return (
+      <div className="flex flex-col items-center gap-1.5 p-4 border-t bg-white text-center">
+        <p className="text-xs text-muted-foreground">
+          Monthly prompt limit reached
+          {limitResetDate ? ` — resets ${limitResetDate}` : ""}.
+        </p>
+        <Link href="/billing" className="text-xs font-medium text-primary hover:underline">
+          Upgrade your plan
+        </Link>
+      </div>
+    );
   }
 
   return (

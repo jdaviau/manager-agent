@@ -11,5 +11,6 @@ export type SSEEvent =
   | { type: "text"; delta: string }
   | { type: "tool_start"; name: string }
   | { type: "tool_result"; name: string; success: boolean }
+  | { type: "usage_warning"; count: number; limit: number }
   | { type: "done" }
   | { type: "error"; message: string };

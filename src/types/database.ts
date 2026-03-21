@@ -93,6 +93,28 @@ export interface PlayerPayment {
   updated_at: string;
 }
 
+export interface Subscription {
+  id: string;
+  user_id: string;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  plan: "core" | "pro";
+  status: "active" | "canceled" | "past_due" | "trialing" | "incomplete";
+  current_period_end: string | null;
+  cancel_at_period_end: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PromptUsage {
+  id: string;
+  user_id: string;
+  year_month: string;
+  count: number;
+  created_at: string;
+  updated_at: string;
+}
+
 // Generic Supabase DB type used by createClient
 export interface Database {
   public: {
@@ -104,6 +126,8 @@ export interface Database {
       expenses: { Row: Expense; Insert: Partial<Expense>; Update: Partial<Expense> };
       games: { Row: Game; Insert: Partial<Game>; Update: Partial<Game> };
       player_payments: { Row: PlayerPayment; Insert: Partial<PlayerPayment>; Update: Partial<PlayerPayment> };
+      subscriptions: { Row: Subscription; Insert: Partial<Subscription>; Update: Partial<Subscription> };
+      prompt_usage: { Row: PromptUsage; Insert: Partial<PromptUsage>; Update: Partial<PromptUsage> };
     };
     Enums: {
       expense_category: ExpenseCategory;

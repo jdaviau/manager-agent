@@ -10,6 +10,7 @@ export function useChat(teamId: string) {
   const [streamingContent, setStreamingContent] = useState("");
   const [activeToolName, setActiveToolName] = useState<string | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [usageWarning, setUsageWarning] = useState<{ count: number; limit: number } | null>(null);
 
   const sendMessage = useCallback(
     async (text: string) => {
@@ -71,6 +72,8 @@ export function useChat(teamId: string) {
                 setStreamingContent(accumulatedText);
               } else if (event.type === "tool_start") {
                 setActiveToolName(event.name);
+              } else if (event.type === "usage_warning") {
+                setUsageWarning({ count: event.count, limit: event.limit });
               } else if (event.type === "tool_result") {
                 setActiveToolName(null);
                 // Dispatch refresh event so dashboard updates
@@ -118,5 +121,5 @@ export function useChat(teamId: string) {
     [apiMessages, isStreaming, teamId]
   );
 
-  return { messages, streamingContent, activeToolName, isStreaming, sendMessage };
+  return { messages, streamingContent, activeToolName, isStreaming, usageWarning, sendMessage };
 }

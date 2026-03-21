@@ -3,14 +3,38 @@
 import { ChatMessages } from "./ChatMessages";
 import { ChatInput } from "./ChatInput";
 import { useChat } from "@/hooks/useChat";
+import { useSubscription } from "@/hooks/useSubscription";
+import Link from "next/link";
 
 interface Props {
   teamId: string;
 }
 
 export function ChatPanel({ teamId }: Props) {
-  const { messages, streamingContent, activeToolName, isStreaming, sendMessage } =
+  const { messages, streamingContent, activeToolName, isStreaming, usageWarning, sendMessage } =
     useChat(teamId);
+  const { usage, isAtLimit, isNearLimit, subscription } = useSubscription();
+
+  // Use live subscription data; fall back to SSE warning if subscription not yet loaded
+  const displayCount = usage.count > 0 ? usage.count : (usageWarning?.count ?? 0);
+  const displayLimit = usage.limit > 0 ? usage.limit : (usageWarning?.limit ?? 0);
+  const showUsageBar = displayCount > 0 && displayLimit > 0;
+
+  const usageColor =
+    isAtLimit ? "bg-red-500" : isNearLimit ? "bg-amber-400" : "bg-emerald-500";
+
+  const resetDate = (() => {
+    const now = new Date();
+    const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    return nextMonth.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  })();
+
+  const limitResetDate = subscription?.current_period_end
+    ? new Date(subscription.current_period_end).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      })
+    : resetDate;
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -23,13 +47,38 @@ export function ChatPanel({ teamId }: Props) {
           <p className="text-xs text-muted-foreground">Ask me anything about your team</p>
         </div>
       </div>
+
+      {/* Usage bar */}
+      {showUsageBar && (
+        <Link href="/billing" className="group block px-3 pt-2 pb-1 border-b bg-white">
+          <div className="flex justify-between text-[11px] text-muted-foreground mb-1">
+            <span className="group-hover:text-foreground transition-colors">
+              {displayCount} / {displayLimit} prompts this month
+            </span>
+            {isAtLimit && <span className="text-red-500 font-medium">Limit reached</span>}
+            {isNearLimit && !isAtLimit && <span className="text-amber-500 font-medium">Near limit</span>}
+          </div>
+          <div className="h-1 w-full rounded-full bg-muted overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all ${usageColor}`}
+              style={{ width: `${Math.min((displayCount / displayLimit) * 100, 100)}%` }}
+            />
+          </div>
+        </Link>
+      )}
+
       <ChatMessages
         messages={messages}
         streamingContent={streamingContent}
         activeToolName={activeToolName}
         isStreaming={isStreaming}
       />
-      <ChatInput onSend={sendMessage} disabled={isStreaming} />
+      <ChatInput
+        onSend={sendMessage}
+        disabled={isStreaming}
+        isAtLimit={isAtLimit}
+        limitResetDate={limitResetDate}
+      />
     </div>
   );
 }

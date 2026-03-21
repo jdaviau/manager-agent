@@ -6,7 +6,8 @@ import { ChatPanel } from "@/components/chat/ChatPanel";
 import { DashboardPanel } from "@/components/dashboard/DashboardPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MessageSquare, LayoutDashboard, LogOut } from "lucide-react";
+import { MessageSquare, LayoutDashboard, LogOut, CreditCard } from "lucide-react";
+import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import type { Team } from "@/types/database";
 
@@ -171,15 +172,27 @@ export default function DashboardPage() {
             </>
           )}
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleSignOut}
-          className="text-muted-foreground hover:text-foreground gap-1.5"
-        >
-          <LogOut className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline text-xs">Sign out</span>
-        </Button>
+        <div className="flex items-center gap-1">
+          <Link href="/billing">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-foreground gap-1.5"
+            >
+              <CreditCard className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline text-xs">Billing</span>
+            </Button>
+          </Link>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSignOut}
+            className="text-muted-foreground hover:text-foreground gap-1.5"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline text-xs">Sign out</span>
+          </Button>
+        </div>
       </header>
 
       {/* Main content area */}

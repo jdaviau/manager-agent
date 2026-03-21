@@ -62,6 +62,43 @@ export async function POST(req: NextRequest) {
   }
   console.log("[agent] ✅ Team OK —", team.name);
 
+  // Prompt limit check
+  const { data: subRaw } = await supabase
+    .from("subscriptions")
+    .select("plan")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  const plan = subRaw?.plan ?? "core";
+
+  const limit =
+    plan === "pro"
+      ? parseInt(process.env.PROMPT_LIMIT_PRO ?? "200")
+      : parseInt(process.env.PROMPT_LIMIT_CORE ?? "50");
+
+  const yearMonth = new Date().toISOString().slice(0, 7);
+  const { data: usageRaw } = await supabase
+    .from("prompt_usage")
+    .select("count")
+    .eq("user_id", user.id)
+    .eq("year_month", yearMonth)
+    .maybeSingle();
+  const currentCount = usageRaw?.count ?? 0;
+
+  if (currentCount >= limit) {
+    return new Response(
+      JSON.stringify({ error: "Monthly prompt limit reached", limit, count: currentCount, year_month: yearMonth }),
+      { status: 429 }
+    );
+  }
+
+  // Increment usage before running the agent
+  await supabase.from("prompt_usage").upsert(
+    { user_id: user.id, year_month: yearMonth, count: currentCount + 1 },
+    { onConflict: "user_id,year_month" }
+  );
+
+  const isNearLimit = (currentCount + 1) / limit >= 0.8;
+
   // Build context for the system prompt
   const { data: playersRaw } = await supabase
     .from("players")
@@ -106,6 +143,9 @@ export async function POST(req: NextRequest) {
       }
 
       try {
+        if (isNearLimit) {
+          emit({ type: "usage_warning", count: currentCount + 1, limit });
+        }
         console.log("[agent] Starting agent loop...");
         await runAgentLoop(messages, systemPrompt, teamId, supabase, emit);
         console.log("[agent] ✅ Agent loop complete");
