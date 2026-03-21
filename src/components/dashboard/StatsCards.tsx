@@ -27,7 +27,7 @@ export function StatsCards({ activePlayers, totalPlayers, budget, totalSpent, to
   return (
     <div className="grid grid-cols-2 gap-3 @container">
       {/* Active Players */}
-      <Card className="bg-gradient-to-t from-primary/5 to-card shadow-xs">
+      <Card className="shadow-xs">
         <CardHeader>
           <CardDescription className="flex items-center gap-1.5">
             <Users className="h-3.5 w-3.5" />
@@ -52,7 +52,7 @@ export function StatsCards({ activePlayers, totalPlayers, budget, totalSpent, to
       </Card>
 
       {/* Budget */}
-      <Card className="bg-gradient-to-t from-primary/5 to-card shadow-xs">
+      <Card className="shadow-xs">
         <CardHeader>
           <CardDescription className="flex items-center gap-1.5">
             <DollarSign className="h-3.5 w-3.5" />
@@ -81,7 +81,7 @@ export function StatsCards({ activePlayers, totalPlayers, budget, totalSpent, to
       </Card>
 
       {/* Expenses */}
-      <Card className="bg-gradient-to-t from-primary/5 to-card shadow-xs">
+      <Card className="shadow-xs">
         <CardHeader>
           <CardDescription className="flex items-center gap-1.5">
             <TrendingDown className="h-3.5 w-3.5" />
@@ -119,7 +119,7 @@ export function StatsCards({ activePlayers, totalPlayers, budget, totalSpent, to
       </Card>
 
       {/* Collected */}
-      <Card className="bg-gradient-to-t from-primary/5 to-card shadow-xs">
+      <Card className="shadow-xs">
         <CardHeader>
           <CardDescription className="flex items-center gap-1.5">
             <TrendingUp className="h-3.5 w-3.5" />
