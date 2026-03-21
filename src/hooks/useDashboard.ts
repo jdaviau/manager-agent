@@ -10,11 +10,10 @@ interface DashboardData {
   expenses: Expense[];
   games: Game[];
   payments: PlayerPayment[];
-  costPerPlayer: number;
-  costPerGame: number;
   activePlayers: number;
   totalSpent: number;
   totalCollected: number;
+  totalOutstanding: number;
   isLoading: boolean;
 }
 
@@ -85,9 +84,10 @@ export function useDashboard(teamId: string): DashboardData {
   const totalCollected = payments
     .filter((p) => p.status === "paid" || p.status === "partial")
     .reduce((sum, p) => sum + Number(p.amount), 0);
+  const totalOutstanding = payments
+    .filter((p) => p.status === "outstanding")
+    .reduce((sum, p) => sum + Number(p.amount), 0);
   const activePlayers = players.filter((p) => p.status === "active").length;
-  const costPerPlayer = activePlayers > 0 ? totalSpent / activePlayers : 0;
-  const costPerGame = games.length > 0 ? totalSpent / games.length : 0;
 
-  return { players, budget, expenses, games, payments, costPerPlayer, costPerGame, activePlayers, totalSpent, totalCollected, isLoading };
+  return { players, budget, expenses, games, payments, activePlayers, totalSpent, totalCollected, totalOutstanding, isLoading };
 }

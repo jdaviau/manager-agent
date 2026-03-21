@@ -15,7 +15,7 @@ interface Props {
 }
 
 export function DashboardPanel({ teamId }: Props) {
-  const { players, budget, expenses, games, payments, costPerPlayer, costPerGame, activePlayers, totalSpent, totalCollected } =
+  const { players, budget, expenses, games, payments, activePlayers, totalSpent, totalCollected, totalOutstanding } =
     useDashboard(teamId);
 
   return (
@@ -24,13 +24,12 @@ export function DashboardPanel({ teamId }: Props) {
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-4">
           <StatsCards
-            costPerPlayer={costPerPlayer}
-            costPerGame={costPerGame}
             activePlayers={activePlayers}
             totalPlayers={players.length}
-            budgetTotal={budget ? Number(budget.total_amount) : null}
-            budgetSpent={totalSpent}
+            budget={budget}
+            totalSpent={totalSpent}
             totalCollected={totalCollected}
+            totalOutstanding={totalOutstanding}
           />
 
           <Tabs defaultValue="players">

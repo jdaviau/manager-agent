@@ -1,15 +1,15 @@
 "use client";
 
-import { Users, DollarSign, Trophy, TrendingUp } from "lucide-react";
+import { Users, DollarSign, TrendingDown, TrendingUp } from "lucide-react";
+import type { Budget } from "@/types/database";
 
 interface Props {
-  costPerPlayer: number;
-  costPerGame: number;
   activePlayers: number;
   totalPlayers: number;
-  budgetTotal: number | null;
-  budgetSpent: number;
+  budget: Budget | null;
+  totalSpent: number;
   totalCollected: number;
+  totalOutstanding: number;
 }
 
 interface MetricCardProps {
@@ -50,23 +50,20 @@ function MetricCard({ icon, label, value, sub, subColor = "text-muted-foreground
   );
 }
 
-export function StatsCards({ costPerPlayer, costPerGame, activePlayers, totalPlayers, budgetTotal, budgetSpent, totalCollected }: Props) {
-  const remaining = budgetTotal !== null ? budgetTotal - budgetSpent + totalCollected : null;
-  const percentUsed = budgetTotal && budgetTotal > 0 ? Math.round((budgetSpent / budgetTotal) * 100) : null;
+export function StatsCards({ activePlayers, totalPlayers, budget, totalSpent, totalCollected, totalOutstanding }: Props) {
+  const budgetTotal = budget ? Number(budget.total_amount) : null;
+  const netRemaining = budgetTotal !== null ? budgetTotal - totalSpent + totalCollected : null;
 
-  const budgetValue = remaining !== null ? `$${remaining.toFixed(0)}` : "—";
-  const budgetSub =
-    totalCollected > 0
-      ? `$${totalCollected.toFixed(0)} collected from players`
-      : percentUsed !== null
-        ? `${percentUsed}% of $${budgetTotal!.toFixed(0)} used`
-        : "No budget set";
-  const budgetSubColor =
-    percentUsed === null
+  const percentSpent = budgetTotal && budgetTotal > 0
+    ? Math.round((totalSpent / budgetTotal) * 100)
+    : null;
+
+  const expenseSubColor =
+    percentSpent === null
       ? "text-muted-foreground"
-      : percentUsed >= 90
+      : percentSpent >= 90
         ? "text-red-600"
-        : percentUsed >= 70
+        : percentSpent >= 70
           ? "text-yellow-600"
           : "text-emerald-600";
 
@@ -83,26 +80,52 @@ export function StatsCards({ costPerPlayer, costPerGame, activePlayers, totalPla
       />
       <MetricCard
         icon={<DollarSign className="h-3.5 w-3.5" />}
-        label="Budget Left"
-        value={budgetValue}
-        sub={budgetSub}
-        subColor={budgetSubColor}
+        label="Budget"
+        value={budgetTotal !== null ? `$${budgetTotal.toLocaleString()}` : "—"}
+        sub={
+          budget
+            ? netRemaining !== null
+              ? `$${netRemaining.toFixed(0)} net remaining`
+              : budget.season
+            : "No budget set"
+        }
+        subColor={
+          netRemaining === null
+            ? "text-muted-foreground"
+            : netRemaining < 0
+              ? "text-red-600"
+              : "text-emerald-600"
+        }
         iconColor="bg-emerald-100 text-emerald-600"
-        trend={percentUsed !== null && percentUsed >= 70 ? { label: `${100 - percentUsed}% left`, positive: false } : null}
+      />
+      <MetricCard
+        icon={<TrendingDown className="h-3.5 w-3.5" />}
+        label="Expenses"
+        value={totalSpent > 0 ? `$${totalSpent.toLocaleString()}` : "—"}
+        sub={
+          percentSpent !== null
+            ? `${percentSpent}% of $${budgetTotal!.toLocaleString()} budget`
+            : totalSpent > 0
+              ? "No budget set"
+              : "No expenses yet"
+        }
+        subColor={expenseSubColor}
+        iconColor="bg-red-100 text-red-500"
+        trend={percentSpent !== null && percentSpent >= 70 ? { label: `${100 - percentSpent}% left`, positive: false } : null}
       />
       <MetricCard
         icon={<TrendingUp className="h-3.5 w-3.5" />}
-        label="Cost / Player"
-        value={costPerPlayer > 0 ? `$${costPerPlayer.toFixed(0)}` : "—"}
-        sub={costPerPlayer > 0 ? `$${budgetSpent.toFixed(0)} total spend` : "No expenses yet"}
+        label="Collected"
+        value={totalCollected > 0 ? `$${totalCollected.toLocaleString()}` : "—"}
+        sub={
+          totalOutstanding > 0
+            ? `$${totalOutstanding.toLocaleString()} outstanding`
+            : totalCollected > 0
+              ? "All payments received"
+              : "No payments yet"
+        }
+        subColor={totalOutstanding > 0 ? "text-amber-600" : "text-muted-foreground"}
         iconColor="bg-violet-100 text-violet-600"
-      />
-      <MetricCard
-        icon={<Trophy className="h-3.5 w-3.5" />}
-        label="Cost / Game"
-        value={costPerGame > 0 ? `$${costPerGame.toFixed(0)}` : "—"}
-        sub={costPerGame > 0 ? "Based on logged games" : "No games yet"}
-        iconColor="bg-orange-100 text-orange-600"
       />
     </div>
   );
