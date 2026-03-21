@@ -1,13 +1,12 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Users } from "lucide-react";
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 import type { Player } from "@/types/database";
 
-const STATUS_COLORS = {
-  active: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  inactive: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
-  injured: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+const STATUS_STYLES: Record<Player["status"], string> = {
+  active: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100",
+  inactive: "bg-muted text-muted-foreground hover:bg-muted",
+  injured: "bg-yellow-100 text-yellow-700 hover:bg-yellow-100",
 };
 
 interface Props {
@@ -15,56 +14,42 @@ interface Props {
 }
 
 export function PlayerList({ players }: Props) {
-  const active = players.filter((p) => p.status === "active").length;
+  if (players.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground text-center py-6">
+        No players yet. Ask the assistant to add some!
+      </p>
+    );
+  }
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-sm font-medium">
-          <Users className="h-4 w-4" />
-          Roster
-        </div>
-        <span className="text-xs text-muted-foreground">{active} active</span>
-      </div>
-
-      {players.length === 0 ? (
-        <p className="text-sm text-muted-foreground py-4 text-center">
-          No players yet. Ask the assistant to add some!
-        </p>
-      ) : (
-        <div className="rounded-md border overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50">
-              <tr>
-                <th className="text-left px-3 py-2 font-medium text-xs text-muted-foreground">#</th>
-                <th className="text-left px-3 py-2 font-medium text-xs text-muted-foreground">Name</th>
-                <th className="text-left px-3 py-2 font-medium text-xs text-muted-foreground hidden sm:table-cell">Position</th>
-                <th className="text-left px-3 py-2 font-medium text-xs text-muted-foreground">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {players.map((player) => (
-                <tr key={player.id} className="hover:bg-muted/30">
-                  <td className="px-3 py-2 text-muted-foreground">
-                    {player.jersey_number ?? "—"}
-                  </td>
-                  <td className="px-3 py-2 font-medium">{player.name}</td>
-                  <td className="px-3 py-2 text-muted-foreground hidden sm:table-cell">
-                    {player.position ?? "—"}
-                  </td>
-                  <td className="px-3 py-2">
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[player.status]}`}
-                    >
-                      {player.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-12 text-xs">#</TableHead>
+          <TableHead className="text-xs">Name</TableHead>
+          <TableHead className="text-xs hidden sm:table-cell">Position</TableHead>
+          <TableHead className="text-xs">Status</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {players.map((player) => (
+          <TableRow key={player.id}>
+            <TableCell className="text-muted-foreground tabular-nums">
+              {player.jersey_number ?? "—"}
+            </TableCell>
+            <TableCell className="font-medium">{player.name}</TableCell>
+            <TableCell className="text-muted-foreground hidden sm:table-cell">
+              {player.position ?? "—"}
+            </TableCell>
+            <TableCell>
+              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLES[player.status]}`}>
+                {player.status}
+              </span>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 }
