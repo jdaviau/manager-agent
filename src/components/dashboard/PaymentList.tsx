@@ -1,12 +1,13 @@
 "use client";
 
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell, TableFooter } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import type { PlayerPayment, Player } from "@/types/database";
 
-const STATUS_STYLES: Record<string, string> = {
-  paid: "bg-emerald-100 text-emerald-700",
-  partial: "bg-amber-100 text-amber-700",
-  outstanding: "bg-red-100 text-red-700",
+const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive"> = {
+  paid: "default",
+  partial: "secondary",
+  outstanding: "destructive",
 };
 
 interface Props {
@@ -22,7 +23,7 @@ export function PaymentList({ payments, players }: Props) {
 
   if (payments.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground text-center py-6">
+      <p className="text-base text-muted-foreground text-center py-6">
         No payments logged yet.
       </p>
     );
@@ -32,11 +33,11 @@ export function PaymentList({ payments, players }: Props) {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="text-xs">Player</TableHead>
-          <TableHead className="text-xs hidden sm:table-cell">Description</TableHead>
-          <TableHead className="text-xs hidden sm:table-cell">Date</TableHead>
-          <TableHead className="text-xs text-right">Amount</TableHead>
-          <TableHead className="text-xs">Status</TableHead>
+          <TableHead>Player</TableHead>
+          <TableHead className="hidden sm:table-cell">Description</TableHead>
+          <TableHead className="hidden sm:table-cell">Date</TableHead>
+          <TableHead className="text-right">Amount</TableHead>
+          <TableHead>Status</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -45,19 +46,17 @@ export function PaymentList({ payments, players }: Props) {
             <TableCell className="font-medium">
               {playerMap[p.player_id] ?? "Unknown"}
             </TableCell>
-            <TableCell className="text-muted-foreground text-xs hidden sm:table-cell truncate max-w-[140px]">
+            <TableCell className="text-muted-foreground hidden sm:table-cell truncate max-w-[140px]">
               {p.description}
             </TableCell>
-            <TableCell className="text-muted-foreground text-xs hidden sm:table-cell tabular-nums">
+            <TableCell className="text-muted-foreground hidden sm:table-cell tabular-nums">
               {p.payment_date}
             </TableCell>
             <TableCell className="text-right font-medium tabular-nums">
               ${Number(p.amount).toFixed(2)}
             </TableCell>
             <TableCell>
-              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLES[p.status]}`}>
-                {p.status}
-              </span>
+              <Badge variant={STATUS_VARIANT[p.status] ?? "secondary"}>{p.status}</Badge>
             </TableCell>
           </TableRow>
         ))}
@@ -65,8 +64,8 @@ export function PaymentList({ payments, players }: Props) {
       {totalCollected > 0 && (
         <TableFooter>
           <TableRow>
-            <TableCell colSpan={4} className="text-xs font-medium">Collected</TableCell>
-            <TableCell className="text-right font-semibold tabular-nums text-emerald-600">
+            <TableCell colSpan={4} className="font-medium">Collected</TableCell>
+            <TableCell className="text-right font-semibold tabular-nums">
               ${totalCollected.toFixed(2)}
             </TableCell>
           </TableRow>

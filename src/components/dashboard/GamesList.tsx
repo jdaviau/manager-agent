@@ -1,21 +1,15 @@
 "use client";
 
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import type { Game } from "@/types/database";
 
 function ResultBadge({ result }: { result: string | null }) {
-  if (!result) return <span className="text-xs text-muted-foreground">—</span>;
+  if (!result) return <span className="text-muted-foreground">—</span>;
   const isWin = result.toUpperCase().startsWith("W");
   const isLoss = result.toUpperCase().startsWith("L");
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-      isWin ? "bg-emerald-100 text-emerald-700" :
-      isLoss ? "bg-red-100 text-red-700" :
-      "bg-muted text-muted-foreground"
-    }`}>
-      {result}
-    </span>
-  );
+  const variant = isWin ? "default" : isLoss ? "destructive" : "secondary";
+  return <Badge variant={variant}>{result}</Badge>;
 }
 
 interface Props {
@@ -25,7 +19,7 @@ interface Props {
 export function GamesList({ games }: Props) {
   if (games.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground text-center py-6">
+      <p className="text-base text-muted-foreground text-center py-6">
         No games scheduled. Ask the assistant to add one!
       </p>
     );
@@ -39,10 +33,10 @@ export function GamesList({ games }: Props) {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="text-xs">Opponent</TableHead>
-          <TableHead className="text-xs hidden sm:table-cell">Location</TableHead>
-          <TableHead className="text-xs">Date</TableHead>
-          <TableHead className="text-xs">Result</TableHead>
+          <TableHead>Opponent</TableHead>
+          <TableHead className="hidden sm:table-cell">Location</TableHead>
+          <TableHead>Date</TableHead>
+          <TableHead>Result</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -51,12 +45,12 @@ export function GamesList({ games }: Props) {
             <TableCell className="font-medium">
               {game.opponent ? `vs ${game.opponent}` : "Session"}
             </TableCell>
-            <TableCell className="text-muted-foreground text-xs hidden sm:table-cell truncate max-w-[120px]">
+            <TableCell className="text-muted-foreground hidden sm:table-cell truncate max-w-[120px]">
               {game.location ?? "—"}
             </TableCell>
-            <TableCell className="text-xs text-muted-foreground tabular-nums">{game.game_date}</TableCell>
+            <TableCell className="text-muted-foreground tabular-nums">{game.game_date}</TableCell>
             <TableCell>
-              <span className="text-xs text-muted-foreground">Upcoming</span>
+              <span className="text-muted-foreground">Upcoming</span>
             </TableCell>
           </TableRow>
         ))}
@@ -65,10 +59,10 @@ export function GamesList({ games }: Props) {
             <TableCell className="font-medium">
               {game.opponent ? `vs ${game.opponent}` : "Session"}
             </TableCell>
-            <TableCell className="text-muted-foreground text-xs hidden sm:table-cell truncate max-w-[120px]">
+            <TableCell className="text-muted-foreground hidden sm:table-cell truncate max-w-[120px]">
               {game.location ?? "—"}
             </TableCell>
-            <TableCell className="text-xs text-muted-foreground tabular-nums">{game.game_date}</TableCell>
+            <TableCell className="text-muted-foreground tabular-nums">{game.game_date}</TableCell>
             <TableCell><ResultBadge result={game.result} /></TableCell>
           </TableRow>
         ))}

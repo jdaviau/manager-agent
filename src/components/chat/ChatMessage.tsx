@@ -26,7 +26,7 @@ export function ChatMessage({ message }: Props) {
       {/* Bubble */}
       <div
         className={cn(
-          "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm",
+          "max-w-[80%] rounded-2xl px-4 py-2.5 text-base",
           isUser
             ? "bg-primary text-primary-foreground rounded-br-sm"
             : "bg-white border border-border/60 shadow-xs text-foreground rounded-bl-sm"
@@ -35,7 +35,7 @@ export function ChatMessage({ message }: Props) {
         {isUser ? (
           <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
         ) : (
-          <div className="prose prose-sm dark:prose-invert max-w-none leading-relaxed
+          <div className="prose prose-base dark:prose-invert max-w-none leading-relaxed
             [&>*:first-child]:mt-0 [&>*:last-child]:mb-0
             [&_table]:text-xs [&_th]:font-semibold [&_th]:text-left [&_th]:pb-1
             [&_td]:py-0.5 [&_tr]:border-b [&_tr:last-child]:border-0

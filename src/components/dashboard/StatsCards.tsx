@@ -1,6 +1,7 @@
 "use client";
 
 import { Users, DollarSign, TrendingDown, TrendingUp } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Budget } from "@/types/database";
@@ -30,13 +31,13 @@ export function StatsCards({ activePlayers, totalPlayers, budget, totalSpent, to
       <Card className="shadow-xs">
         <CardHeader>
           <CardDescription className="flex items-center gap-1.5">
-            <Users className="h-3.5 w-3.5" />
+            <Users className="size-3.5" />
             Active Players
           </CardDescription>
           <CardTitle className="text-3xl font-bold tabular-nums">{activePlayers}</CardTitle>
           <CardAction>
-            <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-blue-100 text-blue-600 shrink-0">
-              <Users className="h-3.5 w-3.5" />
+            <div className="flex items-center justify-center size-7 rounded-lg bg-primary/10 text-primary shrink-0">
+              <Users className="size-3.5" />
             </div>
           </CardAction>
         </CardHeader>
@@ -55,21 +56,21 @@ export function StatsCards({ activePlayers, totalPlayers, budget, totalSpent, to
       <Card className="shadow-xs">
         <CardHeader>
           <CardDescription className="flex items-center gap-1.5">
-            <DollarSign className="h-3.5 w-3.5" />
+            <DollarSign className="size-3.5" />
             Budget
           </CardDescription>
           <CardTitle className="text-3xl font-bold tabular-nums">
             {budgetTotal !== null ? `$${fmt(budgetTotal)}` : "—"}
           </CardTitle>
           <CardAction>
-            <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-emerald-100 text-emerald-600 shrink-0">
-              <DollarSign className="h-3.5 w-3.5" />
+            <div className="flex items-center justify-center size-7 rounded-lg bg-primary/10 text-primary shrink-0">
+              <DollarSign className="size-3.5" />
             </div>
           </CardAction>
         </CardHeader>
         <CardFooter>
           {netRemaining !== null ? (
-            <span className={`text-xs font-medium ${netRemaining < 0 ? "text-red-600" : "text-emerald-600"}`}>
+            <span className={cn("text-xs font-medium", netRemaining < 0 ? "text-destructive" : "text-muted-foreground")}>
               ${fmt(netRemaining)} net remaining
             </span>
           ) : (
@@ -84,28 +85,27 @@ export function StatsCards({ activePlayers, totalPlayers, budget, totalSpent, to
       <Card className="shadow-xs">
         <CardHeader>
           <CardDescription className="flex items-center gap-1.5">
-            <TrendingDown className="h-3.5 w-3.5" />
+            <TrendingDown className="size-3.5" />
             Expenses
           </CardDescription>
           <CardTitle className="text-3xl font-bold tabular-nums">
             {totalSpent > 0 ? `$${fmt(totalSpent)}` : "—"}
           </CardTitle>
           <CardAction>
-            <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-red-100 text-red-500 shrink-0">
-              <TrendingDown className="h-3.5 w-3.5" />
+            <div className="flex items-center justify-center size-7 rounded-lg bg-destructive/10 text-destructive shrink-0">
+              <TrendingDown className="size-3.5" />
             </div>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex items-center justify-between gap-2">
-          <span className={`text-xs ${
-            percentSpent === null
-              ? "text-muted-foreground"
-              : percentSpent >= 90
-                ? "text-red-600 font-medium"
-                : percentSpent >= 70
-                  ? "text-yellow-600 font-medium"
-                  : "text-muted-foreground"
-          }`}>
+          <span className={cn("text-xs", percentSpent === null
+            ? "text-muted-foreground"
+            : percentSpent >= 90
+              ? "text-destructive font-medium"
+              : percentSpent >= 70
+                ? "text-warning font-medium"
+                : "text-muted-foreground"
+          )}>
             {percentSpent !== null
               ? `${percentSpent}% of $${fmt(budgetTotal!)} budget`
               : totalSpent > 0 ? "No budget set" : "No expenses yet"}
@@ -122,20 +122,20 @@ export function StatsCards({ activePlayers, totalPlayers, budget, totalSpent, to
       <Card className="shadow-xs">
         <CardHeader>
           <CardDescription className="flex items-center gap-1.5">
-            <TrendingUp className="h-3.5 w-3.5" />
+            <TrendingUp className="size-3.5" />
             Collected
           </CardDescription>
           <CardTitle className="text-3xl font-bold tabular-nums">
             {totalCollected > 0 ? `$${fmt(totalCollected)}` : "—"}
           </CardTitle>
           <CardAction>
-            <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-violet-100 text-violet-600 shrink-0">
-              <TrendingUp className="h-3.5 w-3.5" />
+            <div className="flex items-center justify-center size-7 rounded-lg bg-primary/10 text-primary shrink-0">
+              <TrendingUp className="size-3.5" />
             </div>
           </CardAction>
         </CardHeader>
         <CardFooter>
-          <span className={`text-xs ${totalOutstanding > 0 ? "text-amber-600 font-medium" : "text-muted-foreground"}`}>
+          <span className={cn("text-xs", totalOutstanding > 0 ? "text-destructive font-medium" : "text-muted-foreground")}>
             {totalOutstanding > 0
               ? `$${fmt(totalOutstanding)} outstanding`
               : totalCollected > 0

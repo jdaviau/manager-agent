@@ -20,9 +20,9 @@ export function DashboardPanel({ teamId }: Props) {
     useDashboard(teamId);
 
   return (
-    <div className="flex flex-col h-full bg-muted/40">
-      <ScrollArea className="flex-1">
-        <div className="p-4 space-y-4">
+    <div className="flex flex-col h-full bg-background">
+      <ScrollArea className="flex-1 min-h-0">
+        <div className="p-4 flex flex-col gap-4">
           <StatsCards
             activePlayers={activePlayers}
             totalPlayers={players.length}
@@ -34,13 +34,13 @@ export function DashboardPanel({ teamId }: Props) {
 
           <Tabs defaultValue="players">
             <TabsList className="w-full">
-              <TabsTrigger value="players" className="flex-1 text-xs">
+              <TabsTrigger value="players" className="flex-1">
                 Players {players.length > 0 && <span className="ml-1 opacity-50">({players.length})</span>}
               </TabsTrigger>
-              <TabsTrigger value="budget" className="flex-1 text-xs">Budget</TabsTrigger>
-              <TabsTrigger value="expenses" className="flex-1 text-xs">Expenses</TabsTrigger>
-              <TabsTrigger value="games" className="flex-1 text-xs">Games</TabsTrigger>
-              <TabsTrigger value="payments" className="flex-1 text-xs">Payments</TabsTrigger>
+              <TabsTrigger value="budget" className="flex-1">Budget</TabsTrigger>
+              <TabsTrigger value="expenses" className="flex-1">Expenses</TabsTrigger>
+              <TabsTrigger value="games" className="flex-1">Games</TabsTrigger>
+              <TabsTrigger value="payments" className="flex-1">Payments</TabsTrigger>
             </TabsList>
 
             <TabsContent value="players" className="mt-3">

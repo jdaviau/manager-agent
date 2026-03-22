@@ -84,8 +84,8 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-          <p className="text-sm text-muted-foreground">Loading your team...</p>
+          <div className="size-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+          <p className="text-base text-muted-foreground">Loading your team...</p>
         </div>
       </div>
     );
@@ -151,22 +151,22 @@ export default function DashboardPage() {
       {/* Top bar */}
       <header className="flex items-center justify-between px-4 h-14 border-b bg-card shrink-0">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-white text-sm shadow-sm shrink-0">
+          <div className="flex items-center justify-center size-8 rounded-lg bg-primary text-white text-sm shadow-sm shrink-0">
             🏆
           </div>
-          <span className="font-semibold text-sm">{team.name}</span>
+          <span className="font-semibold">{team.name}</span>
           {(team.sport || team.season) && (
             <>
               <Separator orientation="vertical" className="h-4" />
               <div className="hidden sm:flex items-center gap-2">
                 {team.sport && (
-                  <span className="text-xs text-muted-foreground">{team.sport}</span>
+                  <span className="text-base text-muted-foreground">{team.sport}</span>
                 )}
                 {team.sport && team.season && (
-                  <span className="text-muted-foreground/40 text-xs">·</span>
+                  <span className="text-muted-foreground/40 text-base">·</span>
                 )}
                 {team.season && (
-                  <span className="text-xs text-muted-foreground">{team.season}</span>
+                  <span className="text-base text-muted-foreground">{team.season}</span>
                 )}
               </div>
             </>
@@ -179,8 +179,8 @@ export default function DashboardPage() {
               size="sm"
               className="text-muted-foreground hover:text-foreground gap-1.5"
             >
-              <CreditCard className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline text-xs">Billing</span>
+              <CreditCard className="size-3.5" />
+              <span className="hidden sm:inline text-base">Billing</span>
             </Button>
           </Link>
           <Button
@@ -189,8 +189,8 @@ export default function DashboardPage() {
             onClick={handleSignOut}
             className="text-muted-foreground hover:text-foreground gap-1.5"
           >
-            <LogOut className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline text-xs">Sign out</span>
+            <LogOut className="size-3.5" />
+            <span className="hidden sm:inline text-base">Sign out</span>
           </Button>
         </div>
       </header>
@@ -219,16 +219,16 @@ export default function DashboardPage() {
       </div>
 
       {/* Mobile bottom tab bar */}
-      <nav className="lg:hidden flex border-t bg-white shrink-0 shadow-[0_-1px_3px_rgba(0,0,0,0.06)]">
+      <nav className="lg:hidden flex border-t bg-background shrink-0 shadow-[0_-1px_3px_rgba(0,0,0,0.06)]">
         <button
           onClick={() => setActiveTab("chat")}
-          className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-xs font-medium transition-colors ${
+          className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-base font-medium transition-colors ${
             activeTab === "chat"
               ? "text-primary"
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          <MessageSquare className={`h-5 w-5 ${activeTab === "chat" ? "stroke-[2.5]" : ""}`} />
+          <MessageSquare className={`size-5 ${activeTab === "chat" ? "stroke-[2.5]" : ""}`} />
           <span>Chat</span>
           {activeTab === "chat" && (
             <div className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-primary rounded-t-full" />
@@ -236,13 +236,13 @@ export default function DashboardPage() {
         </button>
         <button
           onClick={() => setActiveTab("dashboard")}
-          className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-xs font-medium transition-colors relative ${
+          className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-base font-medium transition-colors relative ${
             activeTab === "dashboard"
               ? "text-primary"
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          <LayoutDashboard className={`h-5 w-5 ${activeTab === "dashboard" ? "stroke-[2.5]" : ""}`} />
+          <LayoutDashboard className={`size-5 ${activeTab === "dashboard" ? "stroke-[2.5]" : ""}`} />
           <span>Dashboard</span>
           {activeTab === "dashboard" && (
             <div className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-primary rounded-t-full" />

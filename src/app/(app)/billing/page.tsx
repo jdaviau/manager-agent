@@ -5,23 +5,20 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, CreditCard } from "lucide-react";
 import Link from "next/link";
 
 function UsageMeter({ count, limit }: { count: number; limit: number }) {
   const pct = Math.min((count / limit) * 100, 100);
-  const color =
-    pct >= 100 ? "bg-red-500" : pct >= 80 ? "bg-amber-400" : "bg-emerald-500";
 
   return (
-    <div className="space-y-1.5">
+    <div className="flex flex-col gap-1.5">
       <div className="flex justify-between text-xs text-muted-foreground">
         <span>{count} / {limit} prompts used this month</span>
         <span>{Math.round(pct)}%</span>
       </div>
-      <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-        <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
-      </div>
+      <Progress value={pct} className="h-2" />
     </div>
   );
 }
@@ -77,15 +74,15 @@ export default function BillingPage() {
     : null;
 
   return (
-    <div className="min-h-screen bg-muted/40">
-      <div className="max-w-xl mx-auto px-4 py-8 space-y-6">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-xl mx-auto px-4 py-8 flex flex-col gap-6">
 
         {/* Back link */}
         <Link
           href="/dashboard"
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="size-4" />
           Back to dashboard
         </Link>
 
@@ -96,7 +93,7 @@ export default function BillingPage() {
 
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <div className="w-6 h-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+            <div className="size-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
           </div>
         ) : (
           <>
@@ -113,7 +110,7 @@ export default function BillingPage() {
                   {statusBadge(subscription?.status ?? null)}
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="flex flex-col gap-4">
                 <UsageMeter count={usage.count} limit={usage.limit} />
 
                 {renewalDate && (
@@ -132,7 +129,7 @@ export default function BillingPage() {
                       onClick={handlePortal}
                       disabled={portalLoading}
                     >
-                      <CreditCard className="h-3.5 w-3.5 mr-1.5" />
+                      <CreditCard data-icon="inline-start" />
                       {portalLoading ? "Opening…" : "Manage billing"}
                     </Button>
                   )}
@@ -191,12 +188,12 @@ export default function BillingPage() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
+                  <div className="flex flex-col gap-1.5">
                     <p className="text-sm font-semibold">Core</p>
                     <p className="text-xs text-muted-foreground">Player & roster management, budget tracking, game scheduling, expense logging, payment tracking.</p>
                     <p className="text-xs font-medium tabular-nums">50 prompts / month</p>
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="flex flex-col gap-1.5">
                     <p className="text-sm font-semibold">Pro</p>
                     <p className="text-xs text-muted-foreground">Everything in Core, plus upcoming Pro features.</p>
                     <p className="text-xs font-medium tabular-nums">200 prompts / month</p>

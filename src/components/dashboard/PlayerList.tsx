@@ -1,12 +1,13 @@
 "use client";
 
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import type { Player } from "@/types/database";
 
-const STATUS_STYLES: Record<Player["status"], string> = {
-  active: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100",
-  inactive: "bg-muted text-muted-foreground hover:bg-muted",
-  injured: "bg-yellow-100 text-yellow-700 hover:bg-yellow-100",
+const STATUS_VARIANT: Record<Player["status"], "default" | "secondary" | "outline"> = {
+  active: "default",
+  inactive: "secondary",
+  injured: "outline",
 };
 
 interface Props {
@@ -16,7 +17,7 @@ interface Props {
 export function PlayerList({ players }: Props) {
   if (players.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground text-center py-6">
+      <p className="text-base text-muted-foreground text-center py-6">
         No players yet. Ask the assistant to add some!
       </p>
     );
@@ -26,10 +27,10 @@ export function PlayerList({ players }: Props) {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-12 text-xs">#</TableHead>
-          <TableHead className="text-xs">Name</TableHead>
-          <TableHead className="text-xs hidden sm:table-cell">Position</TableHead>
-          <TableHead className="text-xs">Status</TableHead>
+          <TableHead className="w-12">#</TableHead>
+          <TableHead>Name</TableHead>
+          <TableHead className="hidden sm:table-cell">Position</TableHead>
+          <TableHead>Status</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -43,9 +44,7 @@ export function PlayerList({ players }: Props) {
               {player.position ?? "—"}
             </TableCell>
             <TableCell>
-              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLES[player.status]}`}>
-                {player.status}
-              </span>
+              <Badge variant={STATUS_VARIANT[player.status]}>{player.status}</Badge>
             </TableCell>
           </TableRow>
         ))}

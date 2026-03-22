@@ -35,8 +35,8 @@ export function ChatMessages({ messages, streamingContent, activeToolName, isStr
           <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 text-xl mx-auto">
             🏆
           </div>
-          <p className="font-semibold text-sm">Welcome, Team Manager!</p>
-          <p className="text-xs text-muted-foreground max-w-[200px] leading-relaxed">
+          <p className="font-semibold text-base">Welcome, Team Manager!</p>
+          <p className="text-sm text-muted-foreground max-w-[200px] leading-relaxed">
             Ask me anything about your team or try one of these:
           </p>
         </div>
@@ -48,7 +48,7 @@ export function ChatMessages({ messages, streamingContent, activeToolName, isStr
               className="flex items-start gap-2.5 rounded-xl border border-border/70 bg-white/80 px-3 py-2.5 shadow-xs cursor-default"
             >
               <span className="text-base leading-none mt-0.5">{s.icon}</span>
-              <p className="text-xs text-muted-foreground leading-snug">{s.text}</p>
+              <p className="text-sm text-muted-foreground leading-snug">{s.text}</p>
             </div>
           ))}
         </div>
@@ -78,8 +78,8 @@ export function ChatMessages({ messages, streamingContent, activeToolName, isStr
           <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs shrink-0 self-end">
             🏆
           </div>
-          <div className="max-w-[80%] rounded-2xl rounded-bl-sm px-4 py-2.5 text-sm bg-white border border-border/60 shadow-xs text-foreground">
-            <div className="prose prose-sm dark:prose-invert max-w-none leading-relaxed
+          <div className="max-w-[80%] rounded-2xl rounded-bl-sm px-4 py-2.5 text-base bg-white border border-border/60 shadow-xs text-foreground">
+            <div className="prose prose-base dark:prose-invert max-w-none leading-relaxed
               [&>*:first-child]:mt-0 [&>*:last-child]:mb-0
               [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0.5
               [&_p]:my-1 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0">

@@ -30,8 +30,8 @@ export function UpgradePrompt({ feature }: Props) {
   return (
     <Card className="border-dashed">
       <CardContent className="flex flex-col items-center gap-3 py-8 text-center">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-          <Lock className="h-5 w-5 text-muted-foreground" />
+        <div className="flex size-10 items-center justify-center rounded-full bg-muted">
+          <Lock className="size-5 text-muted-foreground" />
         </div>
         <p className="text-sm font-medium">{feature} requires Pro</p>
         <p className="text-xs text-muted-foreground">Upgrade to unlock this feature.</p>

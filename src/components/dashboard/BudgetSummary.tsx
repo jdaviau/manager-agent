@@ -34,52 +34,52 @@ export function BudgetSummary({ budget, expenses, totalCollected }: Props) {
 
   const progressColor =
     percentUsed >= 90
-      ? "text-red-600"
+      ? "text-destructive"
       : percentUsed >= 75
-        ? "text-yellow-600"
-        : "text-green-600";
+        ? "text-warning"
+        : "text-primary";
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-1.5 text-sm font-medium">
-        <DollarSign className="h-4 w-4" />
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center gap-1.5 text-base font-medium">
+        <DollarSign className="size-4" />
         Budget
         {budget && (
-          <span className="text-xs text-muted-foreground ml-1">({budget.season})</span>
+          <span className="text-base text-muted-foreground ml-1">({budget.season})</span>
         )}
       </div>
 
       {!budget ? (
-        <p className="text-sm text-muted-foreground py-4 text-center">
+        <p className="text-base text-muted-foreground py-4 text-center">
           No budget set. Ask the assistant to set one!
         </p>
       ) : (
         <>
           <div className="grid grid-cols-3 gap-2 text-center">
             <div className="rounded-lg bg-muted/60 border p-2.5">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Total</p>
-              <p className="font-semibold text-sm mt-0.5">${Number(budget.total_amount).toFixed(2)}</p>
+              <p className="text-basetext-muted-foreground uppercase tracking-wide">Total</p>
+              <p className="font-semibold text-base mt-0.5">${Number(budget.total_amount).toFixed(2)}</p>
             </div>
             <div className="rounded-lg bg-muted/60 border p-2.5">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Spent</p>
-              <p className="font-semibold text-sm mt-0.5">${totalSpent.toFixed(2)}</p>
+              <p className="text-basetext-muted-foreground uppercase tracking-wide">Spent</p>
+              <p className="font-semibold text-base mt-0.5">${totalSpent.toFixed(2)}</p>
             </div>
             <div className="rounded-lg bg-muted/60 border p-2.5">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Net Left</p>
-              <p className={`font-semibold text-sm mt-0.5 ${progressColor}`}>
+              <p className="text-basetext-muted-foreground uppercase tracking-wide">Net Left</p>
+              <p className={`font-semibold text-base mt-0.5 ${progressColor}`}>
                 ${remaining.toFixed(2)}
               </p>
             </div>
           </div>
 
           {totalCollected > 0 && (
-            <p className="text-xs text-emerald-600 font-medium text-right">
+            <p className="text-basetext-primary font-medium text-right">
               +${totalCollected.toFixed(2)} collected from players
             </p>
           )}
 
-          <div className="space-y-1">
-            <div className="flex justify-between text-xs text-muted-foreground">
+          <div className="flex flex-col gap-1">
+            <div className="flex justify-between text-base text-muted-foreground">
               <span>{percentUsed}% used</span>
               <span>${remaining.toFixed(2)} remaining</span>
             </div>
@@ -87,14 +87,14 @@ export function BudgetSummary({ budget, expenses, totalCollected }: Props) {
           </div>
 
           {Object.keys(byCategory).length > 0 && (
-            <div className="space-y-1">
-              <p className="text-xs font-medium text-muted-foreground">By Category</p>
+            <div className="flex flex-col gap-1">
+              <p className="text-basefont-medium text-muted-foreground">By Category</p>
               {(Object.entries(byCategory) as [ExpenseCategory, number][])
                 .sort(([, a], [, b]) => b - a)
                 .map(([cat, amount]) => (
-                  <div key={cat} className="flex items-center gap-2 text-xs">
+                  <div key={cat} className="flex items-center gap-2 text-base">
                     <div
-                      className={`h-2 w-2 rounded-full shrink-0 ${CATEGORY_COLORS[cat]}`}
+                      className={`size-2 rounded-full shrink-0 ${CATEGORY_COLORS[cat]}`}
                     />
                     <span className="capitalize flex-1">{cat}</span>
                     <span className="font-medium">${amount.toFixed(2)}</span>
