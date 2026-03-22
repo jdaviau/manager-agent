@@ -51,7 +51,7 @@ export default function BillingPage() {
         body: JSON.stringify({ plan }),
       });
       const { url } = await res.json();
-      if (url) window.location.href = url;
+      if (url) window.open(url, "_blank");
     } finally {
       setCheckoutLoading(null);
     }
@@ -62,7 +62,7 @@ export default function BillingPage() {
     try {
       const res = await fetch("/api/billing/portal", { method: "POST" });
       const { url } = await res.json();
-      if (url) window.location.href = url;
+      if (url) window.open(url, "_blank");
     } finally {
       setPortalLoading(false);
     }
@@ -137,7 +137,29 @@ export default function BillingPage() {
                     </Button>
                   )}
 
-                  {!isPro && (
+                  {/* No subscription: show Subscribe to Core + Subscribe to Pro */}
+                  {!subscription && (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleCheckout("core")}
+                        disabled={checkoutLoading !== null}
+                      >
+                        {checkoutLoading === "core" ? "Redirecting…" : "Subscribe to Core"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => handleCheckout("pro")}
+                        disabled={checkoutLoading !== null}
+                      >
+                        {checkoutLoading === "pro" ? "Redirecting…" : "Subscribe to Pro"}
+                      </Button>
+                    </>
+                  )}
+
+                  {/* Core subscriber: show Upgrade to Pro */}
+                  {subscription?.plan === "core" && isActive && (
                     <Button
                       size="sm"
                       onClick={() => handleCheckout("pro")}
@@ -147,14 +169,15 @@ export default function BillingPage() {
                     </Button>
                   )}
 
-                  {!subscription && (
+                  {/* Pro subscriber: show Downgrade to Core */}
+                  {subscription?.plan === "pro" && isActive && (
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleCheckout("core")}
                       disabled={checkoutLoading !== null}
                     >
-                      {checkoutLoading === "core" ? "Redirecting…" : "Subscribe to Core"}
+                      {checkoutLoading === "core" ? "Redirecting…" : "Downgrade to Core"}
                     </Button>
                   )}
                 </div>

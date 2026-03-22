@@ -21,7 +21,7 @@ export function UpgradePrompt({ feature }: Props) {
         body: JSON.stringify({ plan: "pro" }),
       });
       const { url } = await res.json();
-      if (url) window.location.href = url;
+      if (url) window.open(url, "_blank");
     } finally {
       setLoading(false);
     }
